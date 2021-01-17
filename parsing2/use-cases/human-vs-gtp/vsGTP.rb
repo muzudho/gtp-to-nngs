@@ -1,5 +1,7 @@
 #! /usr/bin/env ruby -Ke
 
+# (^q^) Rename 'vsGTP' to human-vs-gtp'.
+
 require 'gtk'
 require './Goban'
 

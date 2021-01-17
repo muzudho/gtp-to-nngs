@@ -1,5 +1,7 @@
 #! /usr/bin/env ruby -Ke
 
+# (^q^) Rename 'entry' to `human-vs-gnugo`.
+
 require 'gtk'
 
 class GoProg
