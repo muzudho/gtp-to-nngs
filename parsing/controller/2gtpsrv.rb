@@ -1,7 +1,9 @@
 #! /usr/bin/ruby
 
+# (^q^) マッチングして対局を開始するのに使う？
+
 require "socket"
-require './GtpEngine'
+require './ComputerPlayer'
 require './Match'
 
 # メインループ
@@ -18,13 +20,13 @@ while true
 
   # 黒石側のスレッド
   t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cb = GtpEngine.new('black', s)
+    cb = ComputerPlayer.new('black', s)
     print(s, " is accepted as BLACK.\n")
   end
 
   # 白石側のスレッド
   t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cw = GtpEngine.new('white', s)
+    cw = ComputerPlayer.new('white', s)
     print(s, " is accepted as WHITE.\n")
   end
   t1.join

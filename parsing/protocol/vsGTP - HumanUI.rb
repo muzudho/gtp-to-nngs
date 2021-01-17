@@ -1,7 +1,0 @@
-
-
-class HumanUI < GoEngine
-
-
-end
-

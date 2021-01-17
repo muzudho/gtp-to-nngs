@@ -1,6 +1,8 @@
 #! /usr/bin/ruby
 
-require './GtpEngine'
+# (^q^) GNU Go 同士の対局？
+
+require './ComputerPlayer'
 require './Match'
 
 program =if ARGV.size > 0 
@@ -11,8 +13,8 @@ program =if ARGV.size > 0
 
 # 対局を付けて、開始します。
 m = Match.new(
-  GtpEngine.new('black', IO.popen(program, "r+")),
-  GtpEngine.new('white', IO.popen(program, "r+"))
+  ComputerPlayer.new('black', IO.popen(program, "r+")),
+  ComputerPlayer.new('white', IO.popen(program, "r+"))
 )
 m.newgame(10)
 

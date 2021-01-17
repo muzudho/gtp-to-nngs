@@ -1,5 +1,6 @@
 
 def net_match (dpy)
+  # 管理サーバーに接続☆（＾～＾）？
   gs = TCPServer.open(9646)
   socks = [gs]
   addr = gs.addr
@@ -10,16 +11,18 @@ def net_match (dpy)
   cb = nil
   cw = nil
 
+  # 黒番
   t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cb = GtpEngine.new('black', s)
+    cb = ComputerPlayer.new('black', s)
     print cb.send("name\n")
     print cb.send("name\n")
     print cb.send("version\n")
     print(s, " is accepted as BLACK.\n")
   end
 
+  # 白番
   t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cw = GtpEngine.new('white', s)
+    cw = ComputerPlayer.new('white', s)
     print cw.send("name\n")
     print cw.send("name\n")
     print cw.send("name\n")
@@ -31,6 +34,7 @@ def net_match (dpy)
   t2.join
   gs.close()
 
+  # 対局を付けて、開始する☆（＾～＾）
   m = Match.new(cb, cw)
   m.add_display(dpy)
   m.newgame(5)

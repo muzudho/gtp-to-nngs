@@ -1,15 +1,10 @@
-#! /usr/bin/env ruby -Ke
-
-require 'gtk'
-
-window = Gtk::Window.new()
-window.signal_connect('delete_event'){
-  Gtk::main_quit
-}
 
 drawing_area = Gtk::DrawingArea.new()
 drawing_area.set_usize(200, 200)
-window.add(drawing_area)
+
+
+
+
 
 drawing_area.signal_connect("expose_event") do | drawing_area, event |
   drawable = drawing_area.window
@@ -32,6 +27,3 @@ drawing_area.signal_connect("expose_event") do | drawing_area, event |
     drawable.draw_arc(gc, false, box_x, box_y, 100, 100, 0, angle2s[i])
   end
 end
-
-window.show_all
-Gtk.main

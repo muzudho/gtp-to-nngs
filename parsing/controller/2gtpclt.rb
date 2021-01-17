@@ -1,4 +1,7 @@
 #! /usr/bin/ruby
+
+# (^q^) サーバーから クライアント・ソフトに 単発メッセージ（プログラム）を送るのに使う？？
+
 require "socket"
 
 if ARGV.size < 2

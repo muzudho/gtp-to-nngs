@@ -1,13 +1,14 @@
 
 
-
+# サーバーが コンピューター囲碁ソフトに どちらの手番かを伝えるのに使う？
 def genmove
+  # `rcv` - 受信チャンネル
   rcv = send("genmove #{@color}\n")
 
   tmp = rcv.downcase[/resign/]
 
-  # 投了と色
   if tmp == "resign"
+    # 投了と色
     #move = "resign"
     return ["resign" , @color]
 
