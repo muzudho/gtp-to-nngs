@@ -7,7 +7,7 @@
       if gtp_command == "\n"
 	break
       end
-      @playerlistener.each  { | l | l.listen(gtp_command) }
+      @playeralistener.each  { | l | l.listen(gtp_command) }
     end
     result
   end

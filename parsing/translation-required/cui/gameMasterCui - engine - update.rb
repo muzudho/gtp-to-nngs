@@ -15,14 +15,15 @@
                   else 
                     'BLACK'
                   end
-      @gtp = PlayerUpstream.new(@my_color,
+      @player_b = PlayerB.new(@my_color,
                            IO.popen($config['GTP']['command'], "r+"))
-      @gtp.newgame(@game_master.size, @game_master.komi, 60*@game_master.time)  # by sakage 2008/10/25, kato 2015/6/29
+      @player_b.newgame(@game_master.size, @game_master.komi, 60*@game_master.time)  # by sakage 2008/10/25, kato 2015/6/29
 
     when 'my_turn'
-      @gtp.time_left('WHITE', @game_master.white_user[2])
-      @gtp.time_left('BLACK', @game_master.black_user[2])
-      mv, c = @gtp.genmove
+      # NNGSから通知された残り時間をプレイヤーに通知します。
+      @player_b.time_left('WHITE', @game_master.white_user[2])
+      @player_b.time_left('BLACK', @game_master.black_user[2])
+      mv, c = @player_b.genmove
       if mv.nil?
         mv = 'PASS'
       elsif mv == "resign"
@@ -47,9 +48,9 @@
              [i, j]
            end
 #      p [mv, @his_color]
-      @gtp.playmove([mv, @his_color])
+      @player_b.playmove([mv, @his_color])
 
     when 'scoring'
-      @gtp.quit
+      @player_b.quit
     end
   end

@@ -12,8 +12,8 @@ commandline =if 0 < ARGV.size
 
 # 対局を付けて、開始します。
 m = Match.new(
-  PlayerUpstream.new('black', IO.popen(commandline, "r+")),
-  PlayerUpstream.new('white', IO.popen(commandline, "r+"))
+  PlayerB.new('black', IO.popen(commandline, "r+")),
+  PlayerB.new('white', IO.popen(commandline, "r+"))
 )
 m.newgame(10)
 

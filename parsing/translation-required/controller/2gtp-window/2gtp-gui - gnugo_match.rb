@@ -3,8 +3,8 @@
 def gnugo_match(dpy)
   program = "/usr/games/bin/gnugo --mode gtp --quiet"
   m = Match.new(
-    PlayerUpstream.new('black', IO.popen(program, "r+")),
-    PlayerUpstream.new('white', IO.popen(program, "r+"))
+    PlayerB.new('black', IO.popen(program, "r+")),
+    PlayerB.new('white', IO.popen(program, "r+"))
   )
   m.add_translator_display(dpy)
   m.newgame(5)

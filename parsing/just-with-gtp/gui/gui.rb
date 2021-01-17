@@ -11,8 +11,8 @@ goprog = GoProg.new
 
 
 l = ClientListenerUsingGtp.new(textarea)
-player = Player.new
-player.add_playerlistener(l)
+player = PlayerA.new
+player.add_playeralistener(l)
 
 
 
