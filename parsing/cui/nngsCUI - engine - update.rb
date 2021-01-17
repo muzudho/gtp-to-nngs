@@ -4,13 +4,13 @@
 
     when 'start'
       @my_color = case args[1]
-                  when Translator::BLACK
+                  when GameMaster::BLACK
                     'BLACK'
                   else 
                     'WHITE'
                   end
       @his_color = case args[1]
-                  when Translator::BLACK
+                  when GameMaster::BLACK
                     'WHITE'
                   else 
                     'BLACK'

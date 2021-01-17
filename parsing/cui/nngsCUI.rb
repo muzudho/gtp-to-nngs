@@ -15,7 +15,7 @@ server = if ARGV[1].nil?
 	 end
 
 
-nngs = Translator.new(server,
+nngs = GameMaster.new(server,
 		      $config['NNGS']['port'],
 		      user,
 		      $config['NNGS']['pass'],
