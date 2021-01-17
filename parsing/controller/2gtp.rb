@@ -2,7 +2,7 @@
 
 # (^q^) '2gtp' は、 GNU Go 同士の対局？
 
-require './Player'
+require './GtpClient'
 require './Match'
 
 # (^q^) コマンドライン
@@ -14,8 +14,8 @@ commandline =if 0 < ARGV.size
 
 # 対局を付けて、開始します。
 m = Match.new(
-  Player.new('black', IO.popen(commandline, "r+")),
-  Player.new('white', IO.popen(commandline, "r+"))
+  GtpClient.new('black', IO.popen(commandline, "r+")),
+  GtpClient.new('white', IO.popen(commandline, "r+"))
 )
 m.newgame(10)
 

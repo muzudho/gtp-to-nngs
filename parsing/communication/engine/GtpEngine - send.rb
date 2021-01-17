@@ -1,8 +1,8 @@
 
 # 送信
-def send(s)
+def send(gtp_command)
   return unless @io
-  puts " GTP <- #{s}"
-  @io.puts(s)
+  puts " GTP <- #{gtp_command}"
+  @io.puts(gtp_command)
   receive
 end

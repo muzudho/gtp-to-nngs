@@ -7,26 +7,26 @@ def net_match (dpy)
   printf("server is on %s\n", addr.join(":"))
   printf("waiting for clients\n")
 
-  cb = nil
-  cw = nil
+  black_client = nil
+  white_client = nil
 
   # 黒番
-  t1 = Thread.start(translator_server_socket.accept) do |s|       # save to dynamic variable
-    cb = Player.new('black', s)
-    print cb.send("name\n")
-    print cb.send("name\n")
-    print cb.send("version\n")
-    print(s, " is accepted as BLACK.\n")
+  t1 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
+    black_client = GtpEngine.new('black', sock_io)
+    print black_client.send("name\n")
+    print black_client.send("name\n")
+    print black_client.send("version\n")
+    print(sock_io, " is accepted as BLACK.\n")
   end
 
   # 白番
-  t2 = Thread.start(translator_server_socket.accept) do |s|       # save to dynamic variable
-    cw = Player.new('white', s)
-    print cw.send("name\n")
-    print cw.send("name\n")
-    print cw.send("name\n")
-    print cw.send("version\n")
-    print(s, " is accepted as WHITE.\n")
+  t2 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
+    white_client = GtpEngine.new('white', sock_io)
+    print white_client.send("name\n")
+    print white_client.send("name\n")
+    print white_client.send("name\n")
+    print white_client.send("version\n")
+    print(sock_io, " is accepted as WHITE.\n")
   end
 
   t1.join
@@ -34,7 +34,7 @@ def net_match (dpy)
   translator_server_socket.close()
 
   # 対局を付けて、開始する☆（＾～＾）
-  m = Match.new(cb, cw)
+  m = Match.new(black_client, white_client)
   m.add_translator_display(dpy)
   m.newgame(5)
 end

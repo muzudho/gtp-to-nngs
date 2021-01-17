@@ -2,8 +2,8 @@
   # 対局を開始するよう、プレイヤーに通知します。
   def newgame(size = 5, komi = 0.0)
     # 対局を開始するよう、プレイヤーに通知します。
-    @clients.each { | c |
-      c.newgame(size, komi)
+    @clients.each { | player |
+      player.newgame(size, komi)
     }
     # 対局を開始するよう、トランスレータ―の画面に通知します。
     @translator_display.each { | dpy |
@@ -47,7 +47,7 @@
     p @moves
 
     # 両者を終了させます。
-    @clients.each { | c |
-      c.quit
+    @clients.each { | player |
+      player.quit
     }
   end

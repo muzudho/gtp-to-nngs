@@ -4,10 +4,10 @@ def receive
   return unless @io
   rcv = ''
 
-  while (s = @io.gets) 
-    puts " GTP -> #{s}"
-    rcv += s
-    if s == "\n"
+  while (gtp_command = @io.gets) 
+    puts " GTP -> #{gtp_command}"
+    rcv += gtp_command
+    if gtp_command == "\n"
       break
     end
   end

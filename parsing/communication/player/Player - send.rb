@@ -1,8 +1,8 @@
 
 
-  def send(s)
+  def send(gtp_command)
     return unless @io
-    @io.puts(s)
-    @playerlistener.each  { | l | l.listen(s) }
+    @io.puts(gtp_command)
+    @playerlistener.each  { | l | l.listen(gtp_command) }
     receive
   end
