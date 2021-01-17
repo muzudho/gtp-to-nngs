@@ -9,6 +9,7 @@ program =if ARGV.size > 0
            "/usr/games/bin/gnugo --mode gtp --quiet"
          end
 
+# 対局を付けて、開始します。
 m = Match.new(
   GtpEngine.new('black', IO.popen(program, "r+")),
   GtpEngine.new('white', IO.popen(program, "r+"))

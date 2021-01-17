@@ -4,7 +4,9 @@ require "socket"
 require './GtpEngine'
 require './Match'
 
+# メインループ
 while true
+  # 管理者向けサーバー？
   gs = TCPServer.open(9646)
   socks = [gs]
   addr = gs.addr
@@ -13,12 +15,14 @@ while true
   
   cb = nil
   cw = nil
-  
+
+  # 黒石側のスレッド
   t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
     cb = GtpEngine.new('black', s)
     print(s, " is accepted as BLACK.\n")
   end
-  
+
+  # 白石側のスレッド
   t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
     cw = GtpEngine.new('white', s)
     print(s, " is accepted as WHITE.\n")
@@ -27,6 +31,7 @@ while true
   t2.join
   gs.close()
 
+  # 対局を付けて、ゲーム開始
   m = Match.new(cb, cw)
   m.newgame
 

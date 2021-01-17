@@ -11,14 +11,21 @@ else
   print "program: #{program}\n"
 end
 
+# 管理者ログイン？
+# ポートを開きます。
 srv = TCPSocket.open(host, 9646)
+
+# コンピューター囲碁ソフト クライアント？
 gtp = IO.popen(program, "r+")
 #srv.write("init\n")
 
+# メインループ
 while cmd = srv.gets
   p ["cmd", cmd]
   gtp.puts "#{cmd}\n"
   gtp.flush
+
+  # 受信待機
   rcv = ""
   while (s = gtp.gets) 
     rcv += s
@@ -29,5 +36,6 @@ while cmd = srv.gets
   p ["rcv", rcv]
   srv.write rcv
 end
+
 srv.close
 gtp.close

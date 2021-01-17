@@ -1,14 +1,15 @@
 
+# 受信
+def receive
+  return unless @io
+  rcv = ''
 
-  def receive
-    return unless @io
-    rcv = ''
-    while (s = @io.gets) 
-      puts " GTP -> #{s}"
-      rcv += s
-      if s == "\n"
-	break
-      end
+  while (s = @io.gets) 
+    puts " GTP -> #{s}"
+    rcv += s
+    if s == "\n"
+      break
     end
-    rcv
   end
+  rcv
+end

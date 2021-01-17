@@ -1,4 +1,5 @@
 
+  # 投了
   def quit
     send("quit\n")
     @io.close
