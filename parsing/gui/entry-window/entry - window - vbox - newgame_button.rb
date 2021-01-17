@@ -1,8 +1,3 @@
-#! /usr/bin/env ruby -Ke
-
-require 'gtk'
-
-
 
 
 newgame = Gtk::Button.new('newgame')

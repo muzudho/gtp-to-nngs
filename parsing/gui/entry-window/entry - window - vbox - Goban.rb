@@ -1,7 +1,3 @@
-#! /usr/bin/env ruby -Ke
-
-require 'gtk'
-
 
 class Goban < Canvas
   

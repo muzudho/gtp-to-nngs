@@ -1,10 +1,3 @@
-#! /usr/bin/ruby
-
-require 'socket'
-require './Goban'
-require './GtpEngine'
-require './Match'
-
 
 def net_match (dpy)
   gs = TCPServer.open(9646)

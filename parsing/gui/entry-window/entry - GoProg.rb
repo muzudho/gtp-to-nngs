@@ -1,6 +1,3 @@
-#! /usr/bin/env ruby -Ke
-
-require 'gtk'
 
 class GoProg
   @io

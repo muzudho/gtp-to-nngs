@@ -9,8 +9,10 @@ require './Match'
 
 
 
-quit = Gtk::Button.new('quit')
-quit.signal_connect('clicked'){
-  Gtk::main_quit
+Gtk.timeout_add(10) {
+  while (Gtk.events_pending)
+    Gtk.main_iteration
+  end
 }
-vbox.add(quit)
+
+Gtk.main

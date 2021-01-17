@@ -1,7 +1,3 @@
-require './NngsClient'
-require './GtpEngine'
-require './config'
-
 
 human = Class.new
 class << human

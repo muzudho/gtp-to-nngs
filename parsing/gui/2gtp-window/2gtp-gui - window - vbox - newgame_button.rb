@@ -1,10 +1,3 @@
-#! /usr/bin/ruby
-
-require 'socket'
-require './Goban'
-require './GtpEngine'
-require './Match'
-
 
 
 
@@ -14,5 +7,3 @@ newgame.signal_connect('clicked'){
     gnugo_match(goban)
   }
 }
-
-vbox.add(newgame)

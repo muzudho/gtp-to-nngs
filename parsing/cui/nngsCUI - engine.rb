@@ -1,7 +1,3 @@
-require './NngsClient'
-require './GtpEngine'
-require './config'
-
 
 
 engine = Class.new

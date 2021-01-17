@@ -1,0 +1,4 @@
+
+class GtpEngine < GoEngine
+  
+end
