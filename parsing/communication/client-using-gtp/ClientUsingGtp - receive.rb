@@ -7,7 +7,7 @@
       if s == "\n"
 	break
       end
-      @clientlistenergtp.each  { | l | l.listen(s) }
+      @playerlistener.each  { | l | l.listen(s) }
     end
     result
   end

@@ -2,7 +2,7 @@
 
 require 'socket'
 require './Goban'
-require './ClientUsingGtp'
+require './Player'
 require './Match'
 
 

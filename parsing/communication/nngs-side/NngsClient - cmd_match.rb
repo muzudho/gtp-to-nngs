@@ -1,6 +1,5 @@
 
 
-
   def cmd_match(usr) 
     temp = usr.split(/ /)
     nm = temp[0]

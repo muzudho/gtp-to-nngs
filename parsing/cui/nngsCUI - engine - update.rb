@@ -15,7 +15,7 @@
                   else 
                     'BLACK'
                   end
-      @gtp = ClientUsingGtp.new(@my_color,
+      @gtp = Player.new(@my_color,
                            IO.popen($config['GTP']['command'], "r+"))
       @gtp.newgame(@nngs.size, @nngs.komi, 60*@nngs.time)  # by sakage 2008/10/25, kato 2015/6/29
 

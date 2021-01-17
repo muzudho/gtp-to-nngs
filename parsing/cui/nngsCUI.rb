@@ -1,5 +1,5 @@
 require './NngsClient'
-require './ClientUsingGtp'
+require './Player'
 require './config'
 
 user = if ARGV[0].nil?

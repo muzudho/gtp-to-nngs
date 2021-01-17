@@ -1,4 +1,4 @@
 
-  def add_clientlistenergtp(l)
-    @clientlistenergtp << l
+  def add_playerlistener(l)
+    @playerlistener << l
   end

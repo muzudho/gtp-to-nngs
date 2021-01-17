@@ -1,7 +1,4 @@
 
-
-
-
   def cmd_match_ok
     mycolor = @match_accept.split(/ /)[2]
     if mycolor == "W" || mycolor == "w" then

@@ -1,4 +1,4 @@
-# Rename 'GtpEngine' to 'ClientUsingGtp'.
-class ClientUsingGtp
+# Rename 'GtpEngine' to 'Player'.
+class Player
   
 end
