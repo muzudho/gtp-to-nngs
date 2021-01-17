@@ -13,7 +13,7 @@ def net_match (dpy)
 
   # 黒番
   t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cb = Player.new('black', s)
+    cb = ClientUsingGtp.new('black', s)
     print cb.send("name\n")
     print cb.send("name\n")
     print cb.send("version\n")
@@ -22,7 +22,7 @@ def net_match (dpy)
 
   # 白番
   t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cw = Player.new('white', s)
+    cw = ClientUsingGtp.new('white', s)
     print cw.send("name\n")
     print cw.send("name\n")
     print cw.send("name\n")
