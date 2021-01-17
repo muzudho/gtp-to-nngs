@@ -17,11 +17,11 @@
                   end
       @gtp = GtpEngine.new(@my_color,
                            IO.popen($config['GTP']['command'], "r+"))
-      @gtp.newgame(@nngs.size, @nngs.komi, 60*@nngs.time)  # by sakage 2008/10/25, kato 2015/6/29
+      @gtp.newgame(@game_master.size, @game_master.komi, 60*@game_master.time)  # by sakage 2008/10/25, kato 2015/6/29
 
     when 'my_turn'
-      @gtp.time_left('WHITE', @nngs.white_user[2])
-      @gtp.time_left('BLACK', @nngs.black_user[2])
+      @gtp.time_left('WHITE', @game_master.white_user[2])
+      @gtp.time_left('BLACK', @game_master.black_user[2])
       mv, c = @gtp.genmove
       if mv.nil?
         mv = 'PASS'
@@ -32,7 +32,7 @@
         mv = '' << 'ABCDEFGHJKLMNOPQRST'[i-1]
         mv = "#{mv}#{j}"
       end
-      @nngs.input mv
+      @game_master.input mv
 
     when 'his_move'
       nngsmv = args[1]

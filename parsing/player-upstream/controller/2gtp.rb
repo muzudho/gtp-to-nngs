@@ -3,7 +3,6 @@
 # (^q^) '2gtp' は、 GNU Go 同士の対局？
 
 require './GtpClient'
-require './Match'
 
 # (^q^) コマンドライン
 commandline =if 0 < ARGV.size

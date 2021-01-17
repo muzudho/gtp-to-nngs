@@ -5,8 +5,8 @@
     user = $_.chop
 #puts user
     if not user.scan(/n/).empty?
-      @nngs.cmd_match_cancel
+      @game_master.cmd_match_cancel
     else
-      @nngs.cmd_match_ok
+      @game_master.cmd_match_ok
     end
   end

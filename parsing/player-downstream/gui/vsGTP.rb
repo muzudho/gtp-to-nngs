@@ -9,8 +9,8 @@ goprog = GoProg.new
 
 
 l = ClientListenerUsingGtp.new(text)
-gtp = Player.new
-gtp.add_playerlistener(l)
+player = Player.new
+player.add_playerlistener(l)
 
 
 

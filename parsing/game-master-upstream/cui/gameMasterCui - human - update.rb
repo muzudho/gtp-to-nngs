@@ -9,9 +9,9 @@
     when 'cancel'
       select_user
     when 'scoring'
-      @nngs.input 'done'
+      @game_master.input 'done'
     when 'end'
-      @nngs.logout
+      @game_master.logout
       exit
     end
   end

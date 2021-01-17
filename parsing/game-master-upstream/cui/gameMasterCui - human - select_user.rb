@@ -6,6 +6,6 @@
     if user.empty?
       puts 'wating match request.'
     else
-      @nngs.cmd_match user
+      @game_master.cmd_match user
     end
   end

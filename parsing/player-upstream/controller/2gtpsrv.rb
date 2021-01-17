@@ -4,7 +4,6 @@
 
 require "socket"
 require './GtpClient'
-require './Match'
 
 # メインループ
 while true

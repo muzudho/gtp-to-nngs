@@ -1,5 +1,4 @@
 require './NngsClient'
-require './Player'
 require './config'
 
 user = if ARGV[0].nil?
@@ -14,8 +13,8 @@ server = if ARGV[1].nil?
 	   ARGV[1]
 	 end
 
-
-nngs = GameMaster.new(server,
+# (^q^) NNGS.
+game_master = GameMaster.new(server,
 		      $config['NNGS']['port'],
 		      user,
 		      $config['NNGS']['pass'],
@@ -28,17 +27,19 @@ nngs = GameMaster.new(server,
 
 
 
-nngs.add_observer(announce)
-nngs.add_observer(engine)
-engine.nngs= nngs
-nngs.add_observer(human)
-human.nngs= nngs
+game_master.add_observer(announce)
 
-nngs.login
+game_master.add_observer(engine)
+engine.game_master= game_master
+
+game_master.add_observer(human)
+human.game_master= game_master
+
+game_master.login
 #t = Thread.new {
 #  begin
-    while res = select([nngs.socket], nil, nil, nil)
-      nngs.parse
+    while res = select([game_master.socket], nil, nil, nil)
+      game_master.parse
     end
 #  rescue Exception
 
