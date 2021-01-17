@@ -1,5 +1,5 @@
 
 
 class ClientListenerUsingGtp
-
+    @text
 end
