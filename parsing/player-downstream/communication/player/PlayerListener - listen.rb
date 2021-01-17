@@ -1,4 +1,4 @@
 
   def listen(s)
-    @text.insert_text(s, @text.get_length)
+    @textarea.insert_text(s, @textarea.get_length)
   end

@@ -1,4 +1,4 @@
 
-  def initialize(text)
-    @text=text
+  def initialize(textarea)
+    @textarea=textarea
   end

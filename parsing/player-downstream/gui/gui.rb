@@ -10,7 +10,7 @@ goprog = GoProg.new
 
 
 
-l = ClientListenerUsingGtp.new(text)
+l = ClientListenerUsingGtp.new(textarea)
 player = Player.new
 player.add_playerlistener(l)
 
@@ -18,6 +18,6 @@ player.add_playerlistener(l)
 
 
 
-goprog.start(text)
+goprog.start(textarea)
 
 Gtk.main

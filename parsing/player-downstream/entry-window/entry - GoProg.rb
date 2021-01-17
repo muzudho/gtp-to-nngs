@@ -1,6 +1,6 @@
 
 class GoProg
   @io
-  @text
+  @textarea
 
 end

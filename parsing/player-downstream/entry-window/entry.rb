@@ -8,6 +8,6 @@ goban = Goban.new()
 goprog = GoProg.new
 
 
-goprog.start(text)
+goprog.start(textarea)
 
 Gtk.main

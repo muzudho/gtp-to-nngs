@@ -1,4 +1,4 @@
 
-text = Gtk::Text.new()
-text.set_editable(false)
+textarea = Gtk::Text.new()
+textarea.set_editable(false)
 

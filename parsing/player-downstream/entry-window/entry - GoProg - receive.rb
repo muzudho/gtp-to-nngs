@@ -5,8 +5,8 @@
       if s == "\n"
 	break
       end
-      @text.insert_text(s, @text.get_length)
+      @textarea.insert_text(s, @textarea.get_length)
     end
 #    s = @io.read
-#    @text.insert_text(s + "\n", @text.get_length)
+#    @textarea.insert_text(s + "\n", @textarea.get_length)
   end
