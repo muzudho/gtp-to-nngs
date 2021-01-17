@@ -1,6 +1,6 @@
 #! /usr/bin/ruby
 
-# (^q^) サーバーから クライアント・ソフトに 単発メッセージ（プログラム）を送るのに使う？？
+# (^q^) '2gtpclt' は、サーバーから クライアント・ソフトに 単発メッセージ（プログラム）を送るのに使う？？
 
 require "socket"
 
@@ -9,9 +9,9 @@ if ARGV.size < 2
   exit
 else
   host, *prog_v = ARGV
-  program = prog_v.join(' ')
+  commandline = prog_v.join(' ')
   print "host: #{host}\n"
-  print "program: #{program}\n"
+  print "program: #{commandline}\n"
 end
 
 # 管理者ログイン？
@@ -19,7 +19,7 @@ end
 srv = TCPSocket.open(host, 9646)
 
 # コンピューター囲碁ソフト クライアント？
-gtp = IO.popen(program, "r+")
+gtp = IO.popen(commandline, "r+")
 #srv.write("init\n")
 
 # メインループ

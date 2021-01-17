@@ -1,9 +1,8 @@
 
 def net_match (dpy)
-  # 管理サーバーに接続☆（＾～＾）？
-  gs = TCPServer.open(9646)
-  socks = [gs]
-  addr = gs.addr
+  # トランスレータ―（このプログラム）が指定ポートを占有して、TCPサーバーとして常駐するぜ☆（＾～＾）
+  translator_server_socket = TCPServer.open(9646)
+  addr = translator_server_socket.addr
   addr.shift
   printf("server is on %s\n", addr.join(":"))
   printf("waiting for clients\n")
@@ -12,7 +11,7 @@ def net_match (dpy)
   cw = nil
 
   # 黒番
-  t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
+  t1 = Thread.start(translator_server_socket.accept) do |s|       # save to dynamic variable
     cb = Player.new('black', s)
     print cb.send("name\n")
     print cb.send("name\n")
@@ -21,7 +20,7 @@ def net_match (dpy)
   end
 
   # 白番
-  t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
+  t2 = Thread.start(translator_server_socket.accept) do |s|       # save to dynamic variable
     cw = Player.new('white', s)
     print cw.send("name\n")
     print cw.send("name\n")
@@ -32,7 +31,7 @@ def net_match (dpy)
 
   t1.join
   t2.join
-  gs.close()
+  translator_server_socket.close()
 
   # 対局を付けて、開始する☆（＾～＾）
   m = Match.new(cb, cw)
