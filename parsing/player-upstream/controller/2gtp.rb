@@ -3,8 +3,6 @@
 # (^q^) Rename '2gtp' to 'player upstream'.
 # (^q^) '2gtp.rb' は、 GNU Go 同士の対局？
 
-require './GtpClient'
-
 # (^q^) コマンドライン
 commandline =if 0 < ARGV.size
            ARGV.join(' ')
@@ -14,8 +12,8 @@ commandline =if 0 < ARGV.size
 
 # 対局を付けて、開始します。
 m = Match.new(
-  GtpClient.new('black', IO.popen(commandline, "r+")),
-  GtpClient.new('white', IO.popen(commandline, "r+"))
+  PlayerUpstream.new('black', IO.popen(commandline, "r+")),
+  PlayerUpstream.new('white', IO.popen(commandline, "r+"))
 )
 m.newgame(10)
 

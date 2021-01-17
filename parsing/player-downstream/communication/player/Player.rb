@@ -1,9 +1,9 @@
-# Rename 'PlayerUpstream' to 'Player'.
+# Rename 'PlayerDownstream' to 'Player'.
 class Player
     @playerlistener
     @color
     @program
-    @io
+    @sock_io
     @playerlistener
     @color
     @boardsize

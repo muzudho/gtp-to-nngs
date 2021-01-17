@@ -1,6 +1,6 @@
 
 class GoProg
-  @io
+  @sock_io
   @textarea
 
 end

@@ -1,6 +1,6 @@
 # 色
-def initialize(color, io)
+def initialize(color, sock_io)
   @program = p
-  @io = io
+  @sock_io = sock_io
   @color = color
 end

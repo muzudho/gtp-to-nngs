@@ -11,22 +11,22 @@ def net_match (dpy)
   white_client = nil
 
   # 黒番
-  t1 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
-    black_client = PlayerUpstream.new('black', sock_io)
+  t1 = Thread.start(translator_server_socket.accept) do |text|       # save to dynamic variable
+    black_client = PlayerUpstream.new('black', text)
     print black_client.send("name\n")
     print black_client.send("name\n")
     print black_client.send("version\n")
-    print(sock_io, " is accepted as BLACK.\n")
+    print(text, " is accepted as BLACK.\n")
   end
 
   # 白番
-  t2 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
-    white_client = PlayerUpstream.new('white', sock_io)
+  t2 = Thread.start(translator_server_socket.accept) do |text|       # save to dynamic variable
+    white_client = PlayerUpstream.new('white', text)
     print white_client.send("name\n")
     print white_client.send("name\n")
     print white_client.send("name\n")
     print white_client.send("version\n")
-    print(sock_io, " is accepted as WHITE.\n")
+    print(text, " is accepted as WHITE.\n")
   end
 
   t1.join

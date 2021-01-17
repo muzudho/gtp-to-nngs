@@ -5,7 +5,7 @@
     prog="/usr/games/bin/gnugo --mode gtp --quiet"
 
     # 読取モードの追加☆（＾～＾）？
-    @io = IO.popen(prog, "r+")
+    @sock_io = IO.popen(prog, "r+")
 
     @textarea = textarea
   end

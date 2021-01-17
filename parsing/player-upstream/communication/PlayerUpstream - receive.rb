@@ -1,10 +1,10 @@
 
 # 受信
 def receive
-  return unless @io
+  return unless @sock_io
   rcv = ''
 
-  while (gtp_command = @io.gets) 
+  while (gtp_command = @sock_io.gets) 
     puts " GTP -> #{gtp_command}"
     rcv += gtp_command
     if gtp_command == "\n"

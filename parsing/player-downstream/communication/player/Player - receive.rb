@@ -1,13 +1,13 @@
 
   def receive
-    return unless @io
+    return unless @sock_io
     result = ''
-    while (s = @io.gets) 
-      result += s
-      if s == "\n"
+    while (gtp_command = @sock_io.gets) 
+      result += gtp_command
+      if gtp_command == "\n"
 	break
       end
-      @playerlistener.each  { | l | l.listen(s) }
+      @playerlistener.each  { | l | l.listen(gtp_command) }
     end
     result
   end
