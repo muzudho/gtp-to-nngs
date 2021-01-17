@@ -36,6 +36,8 @@ game_master.add_observer(human)
 human.game_master= game_master
 
 game_master.login
+
+# (^q^) メインループ。
 #t = Thread.new {
 #  begin
     while res = select([game_master.socket], nil, nil, nil)

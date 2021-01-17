@@ -2,6 +2,7 @@ require './NngsClient'
 require './GtpEngine'
 require './config'
 
+# (^q^) コマンドラインから設定を引き継ぎます。指定が無ければ設定ファイルから引き継ぎます。
 user = if ARGV[0].nil?
 	 $config['NNGS']['user']
        else
@@ -14,7 +15,7 @@ server = if ARGV[1].nil?
 	   ARGV[1]
 	 end
 
-
+# (^q^) 接続を確率。
 nngs = NNGSClient.new(server,
 		      $config['NNGS']['port'],
 		      user,
@@ -55,6 +56,8 @@ class << engine
                   else 
                     'BLACK'
                   end
+
+      # (^q^) GTPエンジンを起動。
       @gtp = GtpEngine.new(@my_color,
                            IO.popen($config['GTP']['command'], "r+"))
       @gtp.newgame(@nngs.size, @nngs.komi, 60*@nngs.time)  # by sakage 2008/10/25, kato 2015/6/29
@@ -140,12 +143,17 @@ end
 
 
 nngs.add_observer(announce)
+
 nngs.add_observer(engine)
 engine.nngs= nngs
+
 nngs.add_observer(human)
 human.nngs= nngs
 
+# (^q^) NNGS にログインします。
 nngs.login
+
+# (^q^) メインループ。
 #t = Thread.new {
 #  begin
     while res = select([nngs.socket], nil, nil, nil)

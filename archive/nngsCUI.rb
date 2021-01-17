@@ -146,6 +146,8 @@ nngs.add_observer(human)
 human.nngs= nngs
 
 nngs.login
+
+# (^q^) メインループ。
 #t = Thread.new {
 #  begin
     while res = select([nngs.socket], nil, nil, nil)
