@@ -1,7 +1,6 @@
 #! /usr/bin/env ruby -Ke
 
 require 'gtk'
-require './Goban'
 
 
 goban = Goban.new()
@@ -10,11 +9,6 @@ goprog = GoProg.new
 
 text = Gtk::Text.new()
 text.set_editable(false)
-
-
-l = Listener.new(text)
-gtp = GtpEngine.new
-gtp.add_listener(l)
 
 entry = Gtk::Entry.new()
 entry.signal_connect('activate') do | entry | 
@@ -25,19 +19,6 @@ entry.signal_connect('activate') do | entry |
 end
 
 
-newgame = Gtk::Button.new('newgame')
-newgame.signal_connect('clicked'){
-  goban.set_boardsize(5)
-  goprog.send("boardsize 5\n")
-  goprog.send("komi 0\n")
-  goprog.send("clear_board\n")
-}
-
-quit = Gtk::Button.new('quit')
-quit.signal_connect('clicked'){
-  goprog.send("quit\n")
-  Gtk::main_quit
-}
 
 vbox = Gtk::VBox.new();
 vbox.add(goban)
