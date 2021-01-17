@@ -1,5 +1,7 @@
 #! /usr/bin/ruby
 
+# (^q^) Rename '2gtp' to 'player-upstream'.
+
 require 'socket'
 require './Goban'
 

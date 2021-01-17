@@ -15,7 +15,7 @@
                   else 
                     'BLACK'
                   end
-      @gtp = GtpEngine.new(@my_color,
+      @gtp = PlayerUpstream.new(@my_color,
                            IO.popen($config['GTP']['command'], "r+"))
       @gtp.newgame(@game_master.size, @game_master.komi, 60*@game_master.time)  # by sakage 2008/10/25, kato 2015/6/29
 

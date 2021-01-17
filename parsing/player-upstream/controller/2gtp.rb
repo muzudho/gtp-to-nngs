@@ -1,6 +1,7 @@
 #! /usr/bin/ruby
 
-# (^q^) '2gtp' は、 GNU Go 同士の対局？
+# (^q^) Rename '2gtp' to 'player upstream'.
+# (^q^) '2gtp.rb' は、 GNU Go 同士の対局？
 
 require './GtpClient'
 

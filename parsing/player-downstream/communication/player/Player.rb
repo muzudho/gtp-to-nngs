@@ -1,4 +1,4 @@
-# Rename 'GtpEngine' to 'Player'.
+# Rename 'PlayerUpstream' to 'Player'.
 class Player
   
 end

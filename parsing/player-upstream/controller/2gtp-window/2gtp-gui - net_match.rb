@@ -12,7 +12,7 @@ def net_match (dpy)
 
   # 黒番
   t1 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
-    black_client = GtpEngine.new('black', sock_io)
+    black_client = PlayerUpstream.new('black', sock_io)
     print black_client.send("name\n")
     print black_client.send("name\n")
     print black_client.send("version\n")
@@ -21,7 +21,7 @@ def net_match (dpy)
 
   # 白番
   t2 = Thread.start(translator_server_socket.accept) do |sock_io|       # save to dynamic variable
-    white_client = GtpEngine.new('white', sock_io)
+    white_client = PlayerUpstream.new('white', sock_io)
     print white_client.send("name\n")
     print white_client.send("name\n")
     print white_client.send("name\n")

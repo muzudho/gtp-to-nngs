@@ -1,5 +1,7 @@
 #! /usr/bin/env ruby -Ke
 
+# (^q^) Rename 'vsGTP' to 'player downstream'.
+
 require 'gtk'
 require './Goban'
 
