@@ -15,7 +15,7 @@ server = if ARGV[1].nil?
 	 end
 
 
-nngs = NNGSClient.new(server,
+nngs = Translator.new(server,
 		      $config['NNGS']['port'],
 		      user,
 		      $config['NNGS']['pass'],

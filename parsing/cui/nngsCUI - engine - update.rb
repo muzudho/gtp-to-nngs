@@ -4,13 +4,13 @@
 
     when 'start'
       @my_color = case args[1]
-                  when NNGSClient::BLACK
+                  when Translator::BLACK
                     'BLACK'
                   else 
                     'WHITE'
                   end
       @his_color = case args[1]
-                  when NNGSClient::BLACK
+                  when Translator::BLACK
                     'WHITE'
                   else 
                     'BLACK'

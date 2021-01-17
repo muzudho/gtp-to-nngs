@@ -6,7 +6,7 @@ def gnugo_match(dpy)
     Player.new('black', IO.popen(program, "r+")),
     Player.new('white', IO.popen(program, "r+"))
   )
-  m.add_display(dpy)
+  m.add_translator_display(dpy)
   m.newgame(5)
 end
 

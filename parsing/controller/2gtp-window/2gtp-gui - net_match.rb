@@ -36,6 +36,6 @@ def net_match (dpy)
 
   # 対局を付けて、開始する☆（＾～＾）
   m = Match.new(cb, cw)
-  m.add_display(dpy)
+  m.add_translator_display(dpy)
   m.newgame(5)
 end
