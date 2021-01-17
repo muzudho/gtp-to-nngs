@@ -3,7 +3,7 @@
 # (^q^) マッチングして対局を開始するのに使う？
 
 require "socket"
-require './ComputerPlayer'
+require './Player'
 require './Match'
 
 # メインループ
@@ -20,13 +20,13 @@ while true
 
   # 黒石側のスレッド
   t1 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cb = ComputerPlayer.new('black', s)
+    cb = Player.new('black', s)
     print(s, " is accepted as BLACK.\n")
   end
 
   # 白石側のスレッド
   t2 = Thread.start(gs.accept) do |s|       # save to dynamic variable
-    cw = ComputerPlayer.new('white', s)
+    cw = Player.new('white', s)
     print(s, " is accepted as WHITE.\n")
   end
   t1.join

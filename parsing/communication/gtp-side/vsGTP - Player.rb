@@ -1,7 +1,4 @@
-# Rename 'GoEngine' to 'Player'.
+# Rename 'GtpEngine' to 'Player'.
 class Player
-
-
-
+  
 end
-

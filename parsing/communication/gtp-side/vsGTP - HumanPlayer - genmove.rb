@@ -1,4 +1,0 @@
-
-  def genmove
-    
-  end

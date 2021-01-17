@@ -2,7 +2,7 @@
 
 require 'socket'
 require './Goban'
-require './ComputerPlayer'
+require './Player'
 require './Match'
 
 

@@ -9,7 +9,7 @@ goprog = GoProg.new
 
 
 l = Listener.new(text)
-gtp = ComputerPlayer.new
+gtp = Player.new
 gtp.add_listener(l)
 
 
