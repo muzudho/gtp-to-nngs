@@ -1,0 +1,7 @@
+
+class Goban < Canvas
+  
+
+  
+
+end
