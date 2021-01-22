@@ -9,7 +9,7 @@ import (
 )
 
 // LoadEntryConf - Toml形式の参加設定ファイルを読み込みます。
-func LoadEntryConf(path string) c.Config {
+func LoadEntryConf(path string) c.EntryConf {
 
 	// ファイル読込
 	fileData, err := ioutil.ReadFile(path)
@@ -37,7 +37,7 @@ func LoadEntryConf(path string) c.Config {
 
 	// Toml解析
 	binary := []byte(string(fileData))
-	config := c.Config{}
+	config := c.EntryConf{}
 	toml.Unmarshal(binary, &config)
 
 	/*

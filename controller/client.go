@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 
 	"github.com/reiver/go-oi"
@@ -10,12 +11,13 @@ import (
 
 // Client - クライアント
 type Client struct {
+	entryConf EntryConf
 }
 
 // Spawn - クライアント接続
-func (client Client) Spawn() error {
-	// return telnet.DialToAndCall("localhost:5555", clientListener{})
-	return telnet.DialToAndCall("localhost:9696", clientListener{})
+func (client Client) Spawn(entryConf EntryConf) error {
+	client.entryConf = entryConf
+	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), clientListener{})
 }
 
 type clientListener struct{}
