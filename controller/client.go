@@ -32,12 +32,12 @@ func (client Client) Spawn(entryConf EntryConf, nngsListener e.NngsListener) err
 
 // CallTELNET - 決まった形のメソッド。
 func (c clientListener) CallTELNET(ctx telnet.Context, w telnet.Writer, r telnet.Reader) {
-	go c.read(r)
+	go c.read(w, r)
 	write(w)
 }
 
 // 送られてくるメッセージを待ち構えるループです。
-func (c clientListener) read(r telnet.Reader) {
+func (c clientListener) read(w telnet.Writer, r telnet.Reader) {
 	var buffer [1]byte // これが満たされるまで待つ。1バイト。
 	p := buffer[:]
 
@@ -52,7 +52,7 @@ func (c clientListener) read(r telnet.Reader) {
 			print(string(bytes)) // 受け取るたびに表示。
 
 			// 改行を受け取る前にパースしてしまおう☆（＾～＾）早とちりするかも知れないけど☆（＾～＾）
-			c.parse()
+			c.parse(w)
 
 			// 行末を判定できるか☆（＾～＾）？
 			if bytes[0] == '\n' {
@@ -67,13 +67,19 @@ func (c clientListener) read(r telnet.Reader) {
 	}
 }
 
-func (c clientListener) parse() {
+func (c clientListener) parse(w telnet.Writer) {
 	// 現在読み取り中の文字なので、早とちりするかも知れないぜ☆（＾～＾）
 	line := string(c.lineBuffer[:c.index])
 
 	if line == "Login: " {
 		// あなたの名前を入力してください。
-		c.nngsListener.InputYourName()
+		user := c.nngsListener.InputYourName()
+		fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
+		if user != "" {
+			oi.LongWrite(w, []byte(user))
+			oi.LongWrite(w, []byte("\n"))
+		}
+
 	} else {
 
 	}

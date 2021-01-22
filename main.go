@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
-	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/muzudho/gtp-to-nngs/ui"
 )
 
@@ -13,10 +12,10 @@ func main() {
 	entryConf := ui.LoadEntryConf("./input/default.entryConf.toml")
 
 	// NNGSからのメッセージ受信に対応するプログラムを指定したろ☆（＾～＾）
-	nngsListener := e.NngsListener{}
+	nngsController := c.NngsController{EntryConf: entryConf}
 
 	fmt.Println("(^q^) 何か文字を打てだぜ☆ 終わりたかったら [Ctrl]+[C]☆")
 	client := c.Client{}
-	client.Spawn(entryConf, nngsListener)
+	client.Spawn(entryConf, nngsController)
 	fmt.Println("(^q^) おわり☆！")
 }

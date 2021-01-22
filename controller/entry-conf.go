@@ -33,6 +33,8 @@ func (config EntryConf) Port() uint {
 }
 
 // User - 対局者名（アカウント名）
+// Only A-Z a-z 0-9
+// Names may be at most 10 characters long
 func (config EntryConf) User() string {
 	return config.Nngs.User
 }
