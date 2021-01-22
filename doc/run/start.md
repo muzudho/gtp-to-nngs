@@ -30,3 +30,13 @@ cd engine-b-using
 
 ruby nngsCUI.rb
 ```
+
+## godoc
+
+ドキュメントの作成、閲覧方法。  
+
+```shell
+godoc -http=:5555
+```
+
+[http://localhost:5555/](http://localhost:5555/)  
