@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	servstat "github.com/muzudho/gtp-to-nngs/controller/servstat"
 	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
@@ -20,6 +21,9 @@ type clientListener struct {
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
 	lineBuffer [1024]byte
 	index      uint
+
+	// 状態遷移
+	state int
 }
 
 // Spawn - クライアント接続
@@ -74,11 +78,15 @@ func (c clientListener) parse(w telnet.Writer) {
 	if line == "Login: " {
 		// あなたの名前を入力してください。
 		user := c.nngsListener.InputYourName()
-		fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
-		if user != "" {
-			oi.LongWrite(w, []byte(user))
-			oi.LongWrite(w, []byte("\n"))
-		}
+		// fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
+
+		// 強制的に名前は入力したことにするぜ☆（＾～＾）空白入れてはダメ☆（＾～＾）
+		// if user != "" {
+		oi.LongWrite(w, []byte(user))
+		oi.LongWrite(w, []byte("\n"))
+		//}
+
+		c.state = servstat.EnteredMyName
 
 	} else {
 

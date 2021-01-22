@@ -1,5 +1,9 @@
 package controller
 
+import (
+	"fmt"
+)
+
 // NngsController - NNGS からの受信メッセージをさばきます。
 type NngsController struct {
 	// EntryConf - 参加設定
@@ -14,5 +18,5 @@ type NngsController struct {
 // NNGSへ送信したい文字列。無ければ空文字を返してください。
 func (con NngsController) InputYourName() string {
 	// print("ログインきたこれ☆（＾～＾）！")
-	return con.EntryConf.User()
+	return fmt.Sprintf("%s\nset client true", con.EntryConf.User())
 }
