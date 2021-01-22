@@ -47,6 +47,9 @@ func (c clientListener) read(r telnet.Reader) {
 			// 改行がない行も届くので、改行が届くまで待つという処理ができません。
 			print(string(bytes)) // 受け取るたびに表示。
 
+			// 改行を受け取る前にパースしてしまおう☆（＾～＾）早とちりするかも知れないけど☆（＾～＾）
+			c.parse()
+
 			// 行末を判定できるか☆（＾～＾）？
 			if bytes[0] == '\n' {
 				// print("行末だぜ☆（＾～＾）！")
@@ -57,6 +60,17 @@ func (c clientListener) read(r telnet.Reader) {
 		if nil != err {
 			break // 相手が切断したなどの理由でエラーになるので、終了します。
 		}
+	}
+}
+
+func (c clientListener) parse() {
+	// 現在読み取り中の文字なので、早とちりするかも知れないぜ☆（＾～＾）
+	line := string(c.lineBuffer[:c.index])
+
+	if line == "Login: " {
+		// print("ログインきたこれ☆（＾～＾）！")
+	} else {
+
 	}
 }
 
