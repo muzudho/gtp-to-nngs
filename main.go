@@ -3,14 +3,16 @@ package main
 import (
 	"fmt"
 
-	"github.com/muzudho/gtp-to-nngs/controller"
+	c "github.com/muzudho/gtp-to-nngs/controller"
+	"github.com/muzudho/gtp-to-nngs/ui"
 )
 
 func main() {
 	// fmt.Println("設定ファイルを読み込んだろ☆（＾～＾）")
-	controller.LoadEntryConf("./input/default.entryConf.toml")
+	ui.LoadEntryConf("./input/default.entryConf.toml")
 
 	fmt.Println("(^q^) 何か文字を打てだぜ☆ 終わりたかったら [Ctrl]+[C]☆")
-	startClient()
+	client := c.Client{}
+	client.Spawn()
 	fmt.Println("(^q^) おわり☆！")
 }

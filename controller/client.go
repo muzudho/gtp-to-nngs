@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"bufio"
@@ -8,7 +8,12 @@ import (
 	"github.com/reiver/go-telnet"
 )
 
-func startClient() error {
+// Client - クライアント
+type Client struct {
+}
+
+// Spawn - クライアント接続
+func (client Client) Spawn() error {
 	// return telnet.DialToAndCall("localhost:5555", clientListener{})
 	return telnet.DialToAndCall("localhost:9696", clientListener{})
 }
