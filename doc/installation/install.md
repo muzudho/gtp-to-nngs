@@ -39,6 +39,14 @@ c:\go
 go mod init github.com/muzudho/gtp-to-nngs
 ```
 
+## godoc
+
+公式のドキュメント閲覧ツール。  
+
+```shell
+go get golang.org/x/tools/cmd/godoc
+```
+
 ## Telnet
 
 ```shell
