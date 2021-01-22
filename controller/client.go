@@ -13,10 +13,10 @@ import (
 
 // Client - クライアント
 type Client struct {
-	entryConf EntryConf
 }
 
 type clientListener struct {
+	entryConf    EntryConf
 	nngsListener e.NngsListener
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
 	lineBuffer [1024]byte
@@ -28,8 +28,8 @@ type clientListener struct {
 
 // Spawn - クライアント接続
 func (client Client) Spawn(entryConf EntryConf, nngsListener e.NngsListener) error {
-	client.entryConf = entryConf
 	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), clientListener{
+		entryConf:    entryConf,
 		index:        0,
 		nngsListener: nngsListener})
 }
@@ -75,22 +75,50 @@ func (c clientListener) parse(w telnet.Writer) {
 	// 現在読み取り中の文字なので、早とちりするかも知れないぜ☆（＾～＾）
 	line := string(c.lineBuffer[:c.index])
 
-	if line == "Login: " {
-		// あなたの名前を入力してください。
-		user := c.nngsListener.InputYourName()
-		// fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
+	switch c.state {
+	case servstat.None:
+		if line == "Login: " {
+			// あなたの名前を入力してください。
+			user := c.nngsListener.InputYourName()
+			// fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
 
-		// 強制的に名前は入力したことにするぜ☆（＾～＾）空白入れてはダメ☆（＾～＾）
-		// if user != "" {
-		oi.LongWrite(w, []byte(user))
-		oi.LongWrite(w, []byte("\n"))
-		//}
+			// 強制的に名前は入力したことにするぜ☆（＾～＾）空白入れてはダメ☆（＾～＾）
+			// if user != "" {
+			oi.LongWrite(w, []byte(user))
+			oi.LongWrite(w, []byte("\n"))
+			//}
 
-		c.state = servstat.EnteredMyName
+			c.state = servstat.EnteredMyName
+		}
+	case servstat.EnteredMyName:
+		if line == "1 1" {
+			// パスワードを入れろだぜ☆（＾～＾）
+			oi.LongWrite(w, []byte(c.entryConf.Nngs.Pass))
+			oi.LongWrite(w, []byte("\n"))
+			setClientMode(w)
+			c.state = servstat.EnteredClientMode
 
-	} else {
+		} else if line == "Password: " {
+			// パスワードを入れろだぜ☆（＾～＾）
+			oi.LongWrite(w, []byte(c.entryConf.Nngs.Pass))
+			oi.LongWrite(w, []byte("\n"))
+			c.state = servstat.EnteredMyPasswordAndIAmWaitingToBePrompted
 
+		} else if line == "#> " {
+			setClientMode(w)
+			c.state = servstat.EnteredClientMode
+		}
+	case servstat.EnteredMyPasswordAndIAmWaitingToBePrompted:
+		if line == "#> " {
+			setClientMode(w)
+			c.state = servstat.EnteredClientMode
+		}
+	default:
 	}
+}
+
+func setClientMode(w telnet.Writer) {
+	oi.LongWrite(w, []byte("set client true\n"))
 }
 
 // いつでも書き込んで送信できるようにするループです。
