@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
 )
@@ -15,15 +16,18 @@ type Client struct {
 }
 
 type clientListener struct {
+	nngsListener e.NngsListener
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
 	lineBuffer [1024]byte
 	index      uint
 }
 
 // Spawn - クライアント接続
-func (client Client) Spawn(entryConf EntryConf) error {
+func (client Client) Spawn(entryConf EntryConf, nngsListener e.NngsListener) error {
 	client.entryConf = entryConf
-	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), clientListener{index: 0})
+	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), clientListener{
+		index:        0,
+		nngsListener: nngsListener})
 }
 
 // CallTELNET - 決まった形のメソッド。
@@ -68,7 +72,8 @@ func (c clientListener) parse() {
 	line := string(c.lineBuffer[:c.index])
 
 	if line == "Login: " {
-		// print("ログインきたこれ☆（＾～＾）！")
+		// あなたの名前を入力してください。
+		c.nngsListener.InputYourName()
 	} else {
 
 	}
