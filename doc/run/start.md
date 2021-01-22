@@ -9,8 +9,9 @@ NNGSサーバーを立てておく。
 go build
 # gtp-to-nngs.exe ファイルが作成されました。
 
-# コンピューター囲碁エンジンを実行するために、以下の実行ファイルのステム（拡張子を省いた名前）を打鍵してください。
-gtp-to-nngs
+# 実行。
+# * `--entry` - 設定ファイルへのパス。省略したなら `./input/default.entryConf.toml`
+gtp-to-nngs --entry ./input/default.entryConf.toml
 ```
 
 ## engine-b-using, engine-w-using は むずでょが練習してるやつ
