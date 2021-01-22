@@ -4,4 +4,5 @@
 
 ## Documents
 
+* [実行](./doc/run/start.md)
 * [オリジナルの GPT2NNGS2 の readme.txt のコピー](./archive/readme.txt)
