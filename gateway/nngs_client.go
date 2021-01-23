@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"regexp"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
 	servstat "github.com/muzudho/gtp-to-nngs/controller/servstat"
@@ -27,6 +28,9 @@ type libraryListener struct {
 
 	// 状態遷移
 	state int
+
+	// 正規表現
+	regexCommand regexp.Regexp
 }
 
 // Spawn - クライアント接続
@@ -34,7 +38,8 @@ func (client NngsClient) Spawn(entryConf c.EntryConf, nngsListener e.NngsListene
 	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), libraryListener{
 		entryConf:    entryConf,
 		index:        0,
-		nngsListener: nngsListener})
+		nngsListener: nngsListener,
+		regexCommand: *regexp.MustCompile("^(\\d+) (.*)")})
 }
 
 // CallTELNET - 決まった形のメソッド。
@@ -74,7 +79,7 @@ func (lib libraryListener) read(w telnet.Writer, r telnet.Reader) {
 	}
 }
 
-func (lib libraryListener) parse(w telnet.Writer) {
+func (lib *libraryListener) parse(w telnet.Writer) {
 	// 現在読み取り中の文字なので、早とちりするかも知れないぜ☆（＾～＾）
 	line := string(lib.lineBuffer[:lib.index])
 
@@ -122,7 +127,15 @@ func (lib libraryListener) parse(w telnet.Writer) {
 			setClientMode(w)
 			lib.state = servstat.EnteredClientMode
 		}
+	case servstat.EnteredClientMode:
+		// /^(\d+) (.*)/
+		if lib.regexCommand.MatchString(line) {
+			// コマンドの形をしていたぜ☆（＾～＾）
+			// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
+		}
 	default:
+		// 想定外の遷移だぜ☆（＾～＾）！
+		panic(fmt.Sprintf("Unexpected state transition. state=%d", lib.state))
 	}
 }
 

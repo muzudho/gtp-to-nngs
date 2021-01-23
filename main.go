@@ -23,7 +23,7 @@ func main() {
 	nngsController := c.NngsController{EntryConf: entryConf}
 
 	fmt.Println("(^q^) 何か文字を打てだぜ☆ 終わりたかったら [Ctrl]+[C]☆")
-	client := gateway.NngsClient{}
-	client.Spawn(entryConf, nngsController)
+	nngsClient := gateway.NngsClient{}
+	nngsClient.Spawn(entryConf, nngsController)
 	fmt.Println("(^q^) おわり☆！")
 }
