@@ -129,9 +129,28 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 		}
 	case servstat.EnteredClientMode:
 		// /^(\d+) (.*)/
-		if lib.regexCommand.MatchString(line) {
-			// コマンドの形をしていたぜ☆（＾～＾）
-			// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
+		/*
+			if lib.regexCommand.MatchString(line) {
+				// コマンドの形をしていたぜ☆（＾～＾）
+				// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
+			}
+		*/
+		matches := lib.regexCommand.FindSubmatch(lib.lineBuffer[:lib.index])
+		//fmt.Printf("m[%s]", matches)
+		//print(matches)
+		if 1 < len(matches) {
+			switch string(matches[1]) {
+			case "1":
+				print("1だぜ☆")
+			case "9":
+				print("9だぜ☆")
+			case "15":
+				print("15だぜ☆")
+			default:
+				// 想定外の遷移だぜ☆（＾～＾）！
+				panic(fmt.Sprintf("Unexpected state transition. code=%s", matches[1]))
+
+			}
 		}
 	default:
 		// 想定外の遷移だぜ☆（＾～＾）！
