@@ -8,7 +8,7 @@ import (
 	"strconv"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
-	servstat "github.com/muzudho/gtp-to-nngs/controller/servstat"
+	"github.com/muzudho/gtp-to-nngs/controller/servstat"
 	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
@@ -36,7 +36,6 @@ type libraryListener struct {
 	regexCommand           regexp.Regexp
 	regexUseMatch          regexp.Regexp
 	regexUseMatchToRespond regexp.Regexp
-	regexUseMatchAccepted  regexp.Regexp
 	regexMatchAccepted     regexp.Regexp
 	regexDecline1          regexp.Regexp
 	regexDecline2          regexp.Regexp
@@ -45,27 +44,30 @@ type libraryListener struct {
 
 // Spawn - クライアント接続
 func (client NngsClient) Spawn(entryConf c.EntryConf, nngsListener e.NngsListener) error {
-	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), libraryListener{
+	listener := libraryListener{
 		entryConf:              entryConf,
-		index:                  0,
 		nngsListener:           nngsListener,
+		index:                  0,
 		regexCommand:           *regexp.MustCompile("^(\\d+) (.*)"),
 		regexUseMatch:          *regexp.MustCompile("^Use <match"),
 		regexUseMatchToRespond: *regexp.MustCompile("^Use <(.+?)> or <(.+?)> to respond."),
 		regexMatchAccepted:     *regexp.MustCompile("^Match \\[.+?\\] with (\\S+?) in \\S+? accepted."),
 		regexDecline1:          *regexp.MustCompile("declines your request for a match."),
 		regexDecline2:          *regexp.MustCompile("You decline the match offer from"),
-		regexOneSeven:          *regexp.MustCompile("1 7")})
+		regexOneSeven:          *regexp.MustCompile("1 7")}
+	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), listener)
 }
 
 // CallTELNET - 決まった形のメソッド。
 func (lib libraryListener) CallTELNET(ctx telnet.Context, w telnet.Writer, r telnet.Reader) {
+
 	go lib.read(w, r)
+
 	write(w)
 }
 
 // 送られてくるメッセージを待ち構えるループです。
-func (lib libraryListener) read(w telnet.Writer, r telnet.Reader) {
+func (lib *libraryListener) read(w telnet.Writer, r telnet.Reader) {
 	var buffer [1]byte // これが満たされるまで待つ。1バイト。
 	p := buffer[:]
 
@@ -85,6 +87,7 @@ func (lib libraryListener) read(w telnet.Writer, r telnet.Reader) {
 			// 行末を判定できるか☆（＾～＾）？
 			if bytes[0] == '\n' {
 				// print("行末だぜ☆（＾～＾）！")
+				// print("<行末☆>")
 				lib.index = 0
 			}
 		}
@@ -145,12 +148,10 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 		}
 	case servstat.EnteredClientMode:
 		// /^(\d+) (.*)/
-		/*
-			if lib.regexCommand.MatchString(line) {
-				// コマンドの形をしていたぜ☆（＾～＾）
-				// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
-			}
-		*/
+		// if lib.regexCommand.MatchString(line) {
+		// 	// コマンドの形をしていたぜ☆（＾～＾）
+		// 	// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
+		// }
 		matches := lib.regexCommand.FindSubmatch(lib.lineBuffer[:lib.index])
 		//fmt.Printf("m[%s]", matches)
 		//print(matches)
@@ -162,51 +163,35 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 			}
 			switch code {
 			case 1:
-				code2, err := strconv.Atoi(string(matches[1]))
+				subCode, err := strconv.Atoi(string(matches[1]))
 				if err == nil {
-					switch code2 {
-					case 5:
-						if lib.stateSub1 == 7 {
-							print("[マッチが終わったぜ☆]")
-						}
-						lib.stateSub1 = 5
-					case 6:
-						if lib.stateSub1 == 5 {
-							print("[手番が変わったぜ☆]")
-						}
-						lib.stateSub1 = 6
-					case 7:
-						if lib.stateSub1 == 6 {
-							print("[得点計算だぜ☆]")
-						}
-						lib.stateSub1 = 7
-					default:
-						// "1 1" とか来ても無視しろだぜ☆（＾～＾）
-					}
+					lib.parseSub1(w, subCode)
 				}
 
 			case 9:
-				print("9だぜ☆")
+				// print("[9だぜ☆]")
 				if lib.regexUseMatch.Match(matches[2]) {
 					matches2 := lib.regexUseMatchToRespond.FindSubmatch(matches[2])
 					if 2 < len(matches2) {
 						fmt.Printf("対局が付いたぜ☆（＾～＾）accept[%s],decline[%s]", matches2[1], matches2[2])
-						/*
-						   @match_accept = $1
-						   @match_decline = $2
-						   self.match_request($1, $2)
-						*/
+						//    @match_accept = $1
+						//    @match_decline = $2
+						//    self.match_request($1, $2)
 					}
 				} else if lib.regexMatchAccepted.Match(matches[2]) {
+					print("[黒の手番から始まるぜ☆]")
 					// @turn = BLACK
 				} else if lib.regexDecline1.Match(matches[2]) {
+					print("[対局はキャンセルされたぜ☆]")
 					// self.match_cancel
 				} else if lib.regexDecline2.Match(matches[2]) {
+					print("[対局はキャンセルされたぜ☆]")
 					// self.match_cancel
 				} else if lib.regexOneSeven.Match(matches[2]) {
-					// res = parse_1(1, '7')
+					print("[サブ遷移へ☆]")
+					lib.parseSub1(w, 7)
 				} else {
-
+					// "9 1 5" とか来るが、無視しろだぜ☆（＾～＾）
 				}
 			case 15:
 				print("15だぜ☆")
@@ -217,6 +202,28 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 	default:
 		// 想定外の遷移だぜ☆（＾～＾）！
 		panic(fmt.Sprintf("Unexpected state transition. state=%d", lib.state))
+	}
+}
+
+func (lib *libraryListener) parseSub1(w telnet.Writer, subCode int) {
+	switch subCode {
+	case 5:
+		if lib.stateSub1 == 7 {
+			print("[マッチが終わったぜ☆]")
+		}
+		lib.stateSub1 = 5
+	case 6:
+		if lib.stateSub1 == 5 {
+			print("[手番が変わったぜ☆]")
+		}
+		lib.stateSub1 = 6
+	case 7:
+		if lib.stateSub1 == 6 {
+			print("[得点計算だぜ☆]")
+		}
+		lib.stateSub1 = 7
+	default:
+		// "1 1" とか来ても無視しろだぜ☆（＾～＾）
 	}
 }
 
