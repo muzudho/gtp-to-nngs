@@ -45,17 +45,37 @@ type libraryListener struct {
 	regexMove              regexp.Regexp
 
 	// MyColor - 自分の手番の色
-	// "B" - 黒手番
-	// "W" - 白手番
 	MyColor phase.Phase
-	// Phase - 内部状態変数
-	// "B" - 黒手番
-	// "W" - 白手番
-	Phase string
+	// Phase - これから指す方。局面の手番とは逆になる
+	Phase phase.Phase
 	// MyMove - 自分の指し手
 	MyMove string
 	// OpponentMove - 相手の指し手
 	OpponentMove string
+	// CommandOfMatchAccept - 申し込まれた対局を受け入れるコマンド。人間プレイヤーの入力補助用
+	CommandOfMatchAccept string
+	// CommandOfMatchDecline - 申し込まれた対局をお断りするコマンド。人間プレイヤーの入力補助用
+	CommandOfMatchDecline string
+	// GameID - 対局番号☆（＾～＾） 1 から始まる数☆（＾～＾）
+	GameID uint
+	// GameType - なんだか分からないが少なくとも "I" とか入ってるぜ☆（＾～＾）
+	GameType string
+	// GameWName - 白手番の対局者アカウント名
+	GameWName string
+	// GameWField2 - 白手番の２番目のフィールド（用途不明）
+	GameWField2 string
+	// GameWAvailableSeconds - 白手番の残り時間（秒）
+	GameWAvailableSeconds int
+	// GameWField4 - 白手番の４番目のフィールド（用途不明）
+	GameWField4 string
+	// GameBName - 黒手番の対局者アカウント名
+	GameBName string
+	// GameBField2 - 黒手番の２番目のフィールド（用途不明）
+	GameBField2 string
+	// GameBAvailableSeconds - 白手番の残り時間（秒）
+	GameBAvailableSeconds int
+	// GameBField4 - 黒手番の４番目のフィールド（用途不明）
+	GameBField4 string
 }
 
 // Spawn - クライアント接続
@@ -81,7 +101,7 @@ func (lib libraryListener) CallTELNET(ctx telnet.Context, w telnet.Writer, r tel
 
 	go lib.read(w, r)
 
-	write(w)
+	writeByHuman(w)
 }
 
 // 送られてくるメッセージを待ち構えるループです。
@@ -212,13 +232,14 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 					matches2 := lib.regexUseMatchToRespond.FindSubmatch(matches[2])
 					if 2 < len(matches2) {
 						fmt.Printf("対局が付いたぜ☆（＾～＾）accept[%s],decline[%s]", matches2[1], matches2[2])
-						//    @match_accept = $1
-						//    @match_decline = $2
-						//    self.match_request($1, $2)
+						lib.CommandOfMatchAccept = string(matches2[1])
+						lib.CommandOfMatchDecline = string(matches2[2])
+						respondToMatchApplication(w, lib.CommandOfMatchAccept, lib.CommandOfMatchDecline)
 					}
 				} else if lib.regexMatchAccepted.Match(matches[2]) {
-					print("[黒の手番から始まるぜ☆]")
-					// @turn = BLACK
+					// 黒の手番から始まるぜ☆（＾～＾）
+					lib.Phase = phase.Black
+
 				} else if lib.regexDecline1.Match(matches[2]) {
 					print("[対局はキャンセルされたぜ☆]")
 					// self.match_cancel
@@ -233,16 +254,48 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 				}
 			// マッチ確立の合図を得たときだぜ☆（＾～＾）
 			case 15:
-				print("15だぜ☆")
+				// print("15だぜ☆")
 				doing := true
 				if doing {
 					matches2 := lib.regexGame.FindSubmatch(matches[2])
 					if 10 < len(matches2) {
-						fmt.Printf("対局情報☆（＾～＾） gameid[%s], gametype[%s] white_user[%s][%s][%s][%s] black_user[%s][%s][%s][%s]", matches2[1], matches2[2], matches2[3], matches2[4], matches2[5], matches2[6], matches2[7], matches2[8], matches2[9], matches2[10])
-						// @gameid = $1
-						// @gametype = $2
-						// @white_user = [$3, $4, $5, $6]
-						// @black_user = [$7, $8, $9, $10]
+						// 白 VS 黒 の順序固定なのか☆（＾～＾）？ それともマッチを申し込んだ方 VS 申し込まれた方 なのか☆（＾～＾）？
+						// fmt.Printf("対局現在情報☆（＾～＾） gameid[%s], gametype[%s] white_user[%s][%s][%s][%s] black_user[%s][%s][%s][%s]", matches2[1], matches2[2], matches2[3], matches2[4], matches2[5], matches2[6], matches2[7], matches2[8], matches2[9], matches2[10])
+
+						// ゲームID
+						gameID, err := strconv.ParseUint(string(matches2[1]), 10, 0)
+						if err != nil {
+							panic(err)
+						}
+						lib.GameID = uint(gameID)
+
+						// ゲームの型？
+						lib.GameType = string(matches2[2])
+
+						// 白手番の名前、フィールド２、残り時間（秒）、フィールド４
+						lib.GameWName = string(matches2[3])
+						lib.GameWField2 = string(matches2[4])
+
+						gameWAvailableSeconds, err := strconv.Atoi(string(matches2[5]))
+						if err != nil {
+							panic(err)
+						}
+						lib.GameWAvailableSeconds = gameWAvailableSeconds
+
+						lib.GameWField4 = string(matches2[6])
+
+						// 黒手番の名前、フィールド２、残り時間（秒）、フィールド４
+						lib.GameBName = string(matches2[7])
+						lib.GameBField2 = string(matches2[8])
+
+						gameBAvailableSeconds, err := strconv.Atoi(string(matches2[9]))
+						if err != nil {
+							panic(err)
+						}
+						lib.GameBAvailableSeconds = gameBAvailableSeconds
+
+						lib.GameBField4 = string(matches2[10])
+
 						doing = false
 					}
 				}
@@ -251,7 +304,58 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 					matches2 := lib.regexMove.FindSubmatch(matches[2])
 					if 3 < len(matches2) {
 						fmt.Printf("指し手☆（＾～＾） code[%s], color[%s] move[%s]", matches2[1], matches2[2], matches2[3])
-						lib.Phase = string(matches2[2])
+
+						// これから指す方は、局面の手番とは逆になるぜ☆（＾～＾）
+						switch string(matches2[2]) {
+						case "B":
+							lib.Phase = phase.White
+						case "W":
+							lib.Phase = phase.Black
+						default:
+							panic(fmt.Sprintf("Unexpected phase %s", string(matches2[2])))
+						}
+
+						if lib.MyColor == lib.Phase {
+							// 自分に手番が回ってきたなら
+							lib.OpponentMove = string(matches2[3])
+							lib.state = clistat.ItIsMyTurn
+							// my_turn
+							// @gtp.time_left('WHITE', @nngs.white_user[2])
+							// @gtp.time_left('BLACK', @nngs.black_user[2])
+							/*
+							   mv, c = @gtp.genmove
+							   if mv.nil?
+							     mv = 'PASS'
+							   elsif mv == "resign"
+
+							   else
+							     i, j = mv
+							     mv = '' << 'ABCDEFGHJKLMNOPQRST'[i-1]
+							     mv = "#{mv}#{j}"
+							   end
+							   @nngs.input mv
+							*/
+						} else {
+							// 相手番なら
+							lib.MyMove = string(matches2[3])
+							// his_turn
+							/*
+								      nngsmv = args[1]
+								      mv = if nngsmv == 'Pass'
+								             nil
+								           elsif nngsmv.downcase[/resign/] == "resign"
+								             "resign"
+								           else
+								             i = nngsmv.upcase[0].ord - ?A.ord + 1
+									         i = i - 1 if i > ?I.ord - ?A.ord
+								             j = nngsmv[/[0-9]+/].to_i
+								             [i, j]
+								           end
+								#      p [mv, @his_color]
+								      @gtp.playmove([mv, @his_color])
+							*/
+						}
+
 						doing = false
 					}
 				}
@@ -287,12 +391,28 @@ func (lib *libraryListener) parseSub1(w telnet.Writer, subCode int) {
 	}
 }
 
+// 簡易表示モードに切り替えます。
 func setClientMode(w telnet.Writer) {
 	oi.LongWrite(w, []byte("set client true\n"))
 }
 
-// いつでも書き込んで送信できるようにするループです。
-func write(w telnet.Writer) {
+// 申込みに応えます。
+// Original code: match_request(), ask_match().
+func respondToMatchApplication(w telnet.Writer, accept string, decline string) {
+	// 人間プレイヤーなら、尋ねて応答を待ちます。
+	// 'match requested. accept? (Y/n):'
+	// if no
+	//   match_cancel
+	// else
+	//   match_ok
+
+	// コンピューター・プレイヤーなら常に承諾します。
+	message := fmt.Sprintf("%s\n", accept)
+	oi.LongWrite(w, []byte(message))
+}
+
+// 人間がいつでも書き込んで送信できるようにするループです。
+func writeByHuman(w telnet.Writer) {
 	// scanner - 標準入力を監視します。
 	scanner := bufio.NewScanner(os.Stdin)
 	// 一行読み取ります。

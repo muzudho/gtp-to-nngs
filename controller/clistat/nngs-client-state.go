@@ -15,4 +15,6 @@ const (
 	EnteredClientMode
 	// WaitingInTheLobby - 対局が申し込まれるのをロビーで待ちます
 	WaitingInTheLobby
+	// ItIsMyTurn - 自分に手番が回ってきました
+	ItIsMyTurn
 )
