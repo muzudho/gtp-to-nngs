@@ -1,12 +1,12 @@
-package servstat
+package clistat
 
-// NngsClientState - NNGSサーバーでゲームをしているクライアントの状態遷移。
-type NngsClientState int
+// Clistat - Client state. NNGSサーバーでゲームをしているクライアントの状態遷移。
+type Clistat int
 
 // state
 const (
 	// None - 開始。
-	None NngsClientState = iota
+	None Clistat = iota
 	// EnteredMyName - 自分のアカウント名を入力しました
 	EnteredMyName
 	// EnteredMyPasswordAndIAmWaitingToBePrompted - 自分のパスワードを入力し、そしてプロンプトを待っています

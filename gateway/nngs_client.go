@@ -8,7 +8,9 @@ import (
 	"strconv"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
+	"github.com/muzudho/gtp-to-nngs/controller/clistat"
 	e "github.com/muzudho/gtp-to-nngs/entities"
+	"github.com/muzudho/gtp-to-nngs/entities/phase"
 	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
 )
@@ -27,7 +29,7 @@ type libraryListener struct {
 	index      uint
 
 	// 状態遷移
-	state int
+	state clistat.Clistat
 	// 状態遷移の中の小さな区画
 	stateSub1 int
 
@@ -45,7 +47,7 @@ type libraryListener struct {
 	// MyColor - 自分の手番の色
 	// "B" - 黒手番
 	// "W" - 白手番
-	MyColor string
+	MyColor phase.Phase
 	// Phase - 内部状態変数
 	// "B" - 黒手番
 	// "W" - 白手番
@@ -119,7 +121,7 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 	line := string(lib.lineBuffer[:lib.index])
 
 	switch lib.state {
-	case NngsClientState.None:
+	case clistat.None:
 		if line == "Login: " {
 			// あなたの名前を入力してください。
 			user := lib.nngsListener.InputYourName()
@@ -131,9 +133,9 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 			oi.LongWrite(w, []byte("\n"))
 			//}
 
-			lib.state = NngsClientState.EnteredMyName
+			lib.state = clistat.EnteredMyName
 		}
-	case NngsClientState.EnteredMyName:
+	case clistat.EnteredMyName:
 		if line == "1 1" {
 			// パスワードを入れろだぜ☆（＾～＾）
 			if lib.entryConf.Pass() == "" {
@@ -142,7 +144,7 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 			oi.LongWrite(w, []byte(lib.entryConf.Nngs.Pass))
 			oi.LongWrite(w, []byte("\n"))
 			setClientMode(w)
-			lib.state = NngsClientState.EnteredClientMode
+			lib.state = clistat.EnteredClientMode
 
 		} else if line == "Password: " {
 			// パスワードを入れろだぜ☆（＾～＾）
@@ -151,35 +153,38 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 			}
 			oi.LongWrite(w, []byte(lib.entryConf.Nngs.Pass))
 			oi.LongWrite(w, []byte("\n"))
-			lib.state = NngsClientState.EnteredMyPasswordAndIAmWaitingToBePrompted
+			lib.state = clistat.EnteredMyPasswordAndIAmWaitingToBePrompted
 
 		} else if line == "#> " {
 			setClientMode(w)
-			lib.state = NngsClientState.EnteredClientMode
+			lib.state = clistat.EnteredClientMode
 		}
-	case NngsClientState.EnteredMyPasswordAndIAmWaitingToBePrompted:
+	case clistat.EnteredMyPasswordAndIAmWaitingToBePrompted:
 		if line == "#> " {
 			setClientMode(w)
-			lib.state = NngsClientState.EnteredClientMode
+			lib.state = clistat.EnteredClientMode
 		}
-	case NngsClientState.EnteredClientMode:
+	case clistat.EnteredClientMode:
 		if lib.entryConf.Apply() {
 			// 対局を申し込みます。
 			// 2010/8/25 added by manabe (set color)
 			switch lib.entryConf.Phase() {
 			case "W", "w":
-				lib.phase = "W"
-				oi.LongWrite(w, []byte("match #{nm} W #{@size} #{@time} #{@byo_yomi}\n"))
-				self.input
+				lib.MyColor = phase.White
+				message := fmt.Sprintf("match %s W %d %d %d\n", lib.entryConf.Opponent(), lib.entryConf.BoardSize(), lib.entryConf.AvailableTimeMinutes(), lib.entryConf.CanadianTiming())
+				// fmt.Printf("対局を申し込んだぜ☆（＾～＾）[%s]", message)
+				oi.LongWrite(w, []byte(message))
 			case "B", "b":
-				lib.phase = "B"
-				oi.LongWrite(w, []byte("match #{nm} B #{@size} #{@time} #{@byo_yomi}\n"))
+				lib.MyColor = phase.Black
+				message := fmt.Sprintf("match %s B %d %d %d\n", lib.entryConf.Opponent(), lib.entryConf.BoardSize(), lib.entryConf.AvailableTimeMinutes(), lib.entryConf.CanadianTiming())
+				// fmt.Printf("対局を申し込んだぜ☆（＾～＾）[%s]", message)
+				oi.LongWrite(w, []byte(message))
 			default:
 				panic(fmt.Sprintf("Unexpected phase [%s].", lib.entryConf.Phase()))
 			}
 		}
-		lib.state = NngsClientState.WaitingInTheLobby
-	case NngsClientState.WaitingInTheLobby:
+		lib.state = clistat.WaitingInTheLobby
+	case clistat.WaitingInTheLobby:
 		// /^(\d+) (.*)/
 		// if lib.regexCommand.MatchString(line) {
 		// 	// コマンドの形をしていたぜ☆（＾～＾）
