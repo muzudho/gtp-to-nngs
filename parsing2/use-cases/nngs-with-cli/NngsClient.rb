@@ -151,7 +151,7 @@ class NNGSClient
     elsif ! line.scan(/You decline the match offer from/).empty?
       self.match_cancel
     
-    # (^q^) 7 という数字が送られてくるのか……。
+    # (^q^) "9 1 7" という数字列が送られてくるのか……☆？
     elsif ! line.scan(/^1 7/).empty?
       res = parse_1(1, '7')
     

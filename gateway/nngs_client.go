@@ -33,16 +33,29 @@ type libraryListener struct {
 	stateSub1 int
 
 	// 正規表現
-	regexCommand regexp.Regexp
+	regexCommand           regexp.Regexp
+	regexUseMatch          regexp.Regexp
+	regexUseMatchToRespond regexp.Regexp
+	regexUseMatchAccepted  regexp.Regexp
+	regexMatchAccepted     regexp.Regexp
+	regexDecline1          regexp.Regexp
+	regexDecline2          regexp.Regexp
+	regexOneSeven          regexp.Regexp
 }
 
 // Spawn - クライアント接続
 func (client NngsClient) Spawn(entryConf c.EntryConf, nngsListener e.NngsListener) error {
 	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), libraryListener{
-		entryConf:    entryConf,
-		index:        0,
-		nngsListener: nngsListener,
-		regexCommand: *regexp.MustCompile("^(\\d+) (.*)")})
+		entryConf:              entryConf,
+		index:                  0,
+		nngsListener:           nngsListener,
+		regexCommand:           *regexp.MustCompile("^(\\d+) (.*)"),
+		regexUseMatch:          *regexp.MustCompile("^Use <match"),
+		regexUseMatchToRespond: *regexp.MustCompile("^Use <(.+?)> or <(.+?)> to respond."),
+		regexMatchAccepted:     *regexp.MustCompile("^Match \\[.+?\\] with (\\S+?) in \\S+? accepted."),
+		regexDecline1:          *regexp.MustCompile("declines your request for a match."),
+		regexDecline2:          *regexp.MustCompile("You decline the match offer from"),
+		regexOneSeven:          *regexp.MustCompile("1 7")})
 }
 
 // CallTELNET - 決まった形のメソッド。
@@ -141,7 +154,7 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 		matches := lib.regexCommand.FindSubmatch(lib.lineBuffer[:lib.index])
 		//fmt.Printf("m[%s]", matches)
 		//print(matches)
-		if 1 < len(matches) {
+		if 2 < len(matches) {
 			code, err := strconv.Atoi(string(matches[1]))
 			if err != nil {
 				// 想定外の遷移だぜ☆（＾～＾）！
@@ -174,6 +187,27 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 
 			case 9:
 				print("9だぜ☆")
+				if lib.regexUseMatch.Match(matches[2]) {
+					matches2 := lib.regexUseMatchToRespond.FindSubmatch(matches[2])
+					if 2 < len(matches2) {
+						fmt.Printf("対局が付いたぜ☆（＾～＾）accept[%s],decline[%s]", matches2[1], matches2[2])
+						/*
+						   @match_accept = $1
+						   @match_decline = $2
+						   self.match_request($1, $2)
+						*/
+					}
+				} else if lib.regexMatchAccepted.Match(matches[2]) {
+					// @turn = BLACK
+				} else if lib.regexDecline1.Match(matches[2]) {
+					// self.match_cancel
+				} else if lib.regexDecline2.Match(matches[2]) {
+					// self.match_cancel
+				} else if lib.regexOneSeven.Match(matches[2]) {
+					// res = parse_1(1, '7')
+				} else {
+
+				}
 			case 15:
 				print("15だぜ☆")
 			default:
