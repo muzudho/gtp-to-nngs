@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
 	servstat "github.com/muzudho/gtp-to-nngs/controller/servstat"
@@ -28,6 +29,8 @@ type libraryListener struct {
 
 	// 状態遷移
 	state int
+	// 状態遷移の中の小さな区画
+	stateSub1 int
 
 	// 正規表現
 	regexCommand regexp.Regexp
@@ -139,17 +142,42 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 		//fmt.Printf("m[%s]", matches)
 		//print(matches)
 		if 1 < len(matches) {
-			switch string(matches[1]) {
-			case "1":
-				print("1だぜ☆")
-			case "9":
+			code, err := strconv.Atoi(string(matches[1]))
+			if err != nil {
+				// 想定外の遷移だぜ☆（＾～＾）！
+				panic(err)
+			}
+			switch code {
+			case 1:
+				code2, err := strconv.Atoi(string(matches[1]))
+				if err == nil {
+					switch code2 {
+					case 5:
+						if lib.stateSub1 == 7 {
+							print("[マッチが終わったぜ☆]")
+						}
+						lib.stateSub1 = 5
+					case 6:
+						if lib.stateSub1 == 5 {
+							print("[手番が変わったぜ☆]")
+						}
+						lib.stateSub1 = 6
+					case 7:
+						if lib.stateSub1 == 6 {
+							print("[得点計算だぜ☆]")
+						}
+						lib.stateSub1 = 7
+					default:
+						// "1 1" とか来ても無視しろだぜ☆（＾～＾）
+					}
+				}
+
+			case 9:
 				print("9だぜ☆")
-			case "15":
+			case 15:
 				print("15だぜ☆")
 			default:
-				// 想定外の遷移だぜ☆（＾～＾）！
-				panic(fmt.Sprintf("Unexpected state transition. code=%s", matches[1]))
-
+				// 想定外のコードが来ても無視しろだぜ☆（＾～＾）
 			}
 		}
 	default:
