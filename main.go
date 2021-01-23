@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
+	"github.com/muzudho/gtp-to-nngs/gateway"
 	"github.com/muzudho/gtp-to-nngs/ui"
 )
 
@@ -22,7 +23,7 @@ func main() {
 	nngsController := c.NngsController{EntryConf: entryConf}
 
 	fmt.Println("(^q^) 何か文字を打てだぜ☆ 終わりたかったら [Ctrl]+[C]☆")
-	client := c.Client{}
+	client := gateway.NngsClient{}
 	client.Spawn(entryConf, nngsController)
 	fmt.Println("(^q^) おわり☆！")
 }

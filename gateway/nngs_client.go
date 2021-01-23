@@ -1,23 +1,24 @@
-package controller
+package gateway
 
 import (
 	"bufio"
 	"fmt"
 	"os"
 
+	c "github.com/muzudho/gtp-to-nngs/controller"
 	servstat "github.com/muzudho/gtp-to-nngs/controller/servstat"
 	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/reiver/go-oi"
 	"github.com/reiver/go-telnet"
 )
 
-// Client - クライアント
-type Client struct {
+// NngsClient - クライアント
+type NngsClient struct {
 }
 
 // `github.com/reiver/go-telnet` ライブラリーの動作をリスニングします
 type libraryListener struct {
-	entryConf EntryConf
+	entryConf c.EntryConf
 	// NNGSの動作をリスニングします
 	nngsListener e.NngsListener
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
@@ -29,7 +30,7 @@ type libraryListener struct {
 }
 
 // Spawn - クライアント接続
-func (client Client) Spawn(entryConf EntryConf, nngsListener e.NngsListener) error {
+func (client NngsClient) Spawn(entryConf c.EntryConf, nngsListener e.NngsListener) error {
 	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), libraryListener{
 		entryConf:    entryConf,
 		index:        0,
