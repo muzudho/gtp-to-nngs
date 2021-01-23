@@ -15,8 +15,10 @@ import (
 type Client struct {
 }
 
-type clientListener struct {
-	entryConf    EntryConf
+// `github.com/reiver/go-telnet` ライブラリーの動作をリスニングします
+type libraryListener struct {
+	entryConf EntryConf
+	// NNGSの動作をリスニングします
 	nngsListener e.NngsListener
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
 	lineBuffer [1024]byte
@@ -28,20 +30,20 @@ type clientListener struct {
 
 // Spawn - クライアント接続
 func (client Client) Spawn(entryConf EntryConf, nngsListener e.NngsListener) error {
-	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), clientListener{
+	return telnet.DialToAndCall(fmt.Sprintf("%s:%d", entryConf.Nngs.Host, entryConf.Nngs.Port), libraryListener{
 		entryConf:    entryConf,
 		index:        0,
 		nngsListener: nngsListener})
 }
 
 // CallTELNET - 決まった形のメソッド。
-func (c clientListener) CallTELNET(ctx telnet.Context, w telnet.Writer, r telnet.Reader) {
-	go c.read(w, r)
+func (lib libraryListener) CallTELNET(ctx telnet.Context, w telnet.Writer, r telnet.Reader) {
+	go lib.read(w, r)
 	write(w)
 }
 
 // 送られてくるメッセージを待ち構えるループです。
-func (c clientListener) read(w telnet.Writer, r telnet.Reader) {
+func (lib libraryListener) read(w telnet.Writer, r telnet.Reader) {
 	var buffer [1]byte // これが満たされるまで待つ。1バイト。
 	p := buffer[:]
 
@@ -50,18 +52,18 @@ func (c clientListener) read(w telnet.Writer, r telnet.Reader) {
 
 		if n > 0 {
 			bytes := p[:n]
-			c.lineBuffer[c.index] = bytes[0]
-			c.index++
+			lib.lineBuffer[lib.index] = bytes[0]
+			lib.index++
 			// 改行がない行も届くので、改行が届くまで待つという処理ができません。
 			print(string(bytes)) // 受け取るたびに表示。
 
 			// 改行を受け取る前にパースしてしまおう☆（＾～＾）早とちりするかも知れないけど☆（＾～＾）
-			c.parse(w)
+			lib.parse(w)
 
 			// 行末を判定できるか☆（＾～＾）？
 			if bytes[0] == '\n' {
 				// print("行末だぜ☆（＾～＾）！")
-				c.index = 0
+				lib.index = 0
 			}
 		}
 
@@ -71,15 +73,15 @@ func (c clientListener) read(w telnet.Writer, r telnet.Reader) {
 	}
 }
 
-func (c clientListener) parse(w telnet.Writer) {
+func (lib libraryListener) parse(w telnet.Writer) {
 	// 現在読み取り中の文字なので、早とちりするかも知れないぜ☆（＾～＾）
-	line := string(c.lineBuffer[:c.index])
+	line := string(lib.lineBuffer[:lib.index])
 
-	switch c.state {
+	switch lib.state {
 	case servstat.None:
 		if line == "Login: " {
 			// あなたの名前を入力してください。
-			user := c.nngsListener.InputYourName()
+			user := lib.nngsListener.InputYourName()
 			// fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
 
 			// 強制的に名前は入力したことにするぜ☆（＾～＾）空白入れてはダメ☆（＾～＾）
@@ -88,30 +90,36 @@ func (c clientListener) parse(w telnet.Writer) {
 			oi.LongWrite(w, []byte("\n"))
 			//}
 
-			c.state = servstat.EnteredMyName
+			lib.state = servstat.EnteredMyName
 		}
 	case servstat.EnteredMyName:
 		if line == "1 1" {
 			// パスワードを入れろだぜ☆（＾～＾）
-			oi.LongWrite(w, []byte(c.entryConf.Nngs.Pass))
+			if lib.entryConf.Pass() == "" {
+				panic("Need password")
+			}
+			oi.LongWrite(w, []byte(lib.entryConf.Nngs.Pass))
 			oi.LongWrite(w, []byte("\n"))
 			setClientMode(w)
-			c.state = servstat.EnteredClientMode
+			lib.state = servstat.EnteredClientMode
 
 		} else if line == "Password: " {
 			// パスワードを入れろだぜ☆（＾～＾）
-			oi.LongWrite(w, []byte(c.entryConf.Nngs.Pass))
+			if lib.entryConf.Pass() == "" {
+				panic("Need password")
+			}
+			oi.LongWrite(w, []byte(lib.entryConf.Nngs.Pass))
 			oi.LongWrite(w, []byte("\n"))
-			c.state = servstat.EnteredMyPasswordAndIAmWaitingToBePrompted
+			lib.state = servstat.EnteredMyPasswordAndIAmWaitingToBePrompted
 
 		} else if line == "#> " {
 			setClientMode(w)
-			c.state = servstat.EnteredClientMode
+			lib.state = servstat.EnteredClientMode
 		}
 	case servstat.EnteredMyPasswordAndIAmWaitingToBePrompted:
 		if line == "#> " {
 			setClientMode(w)
-			c.state = servstat.EnteredClientMode
+			lib.state = servstat.EnteredClientMode
 		}
 	default:
 	}
