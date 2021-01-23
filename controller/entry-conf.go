@@ -16,6 +16,8 @@ type Nngs struct {
 
 // MatchApplication - [MatchApplication] 区画。
 type MatchApplication struct {
+	Apply                bool
+	Opponent             string
 	Phase                string
 	BoardSize            int64
 	AvailableTimeMinutes int64
@@ -42,6 +44,17 @@ func (config EntryConf) User() string {
 // Pass - 何路盤
 func (config EntryConf) Pass() string {
 	return config.Nngs.Pass
+}
+
+// Apply - 自分の方から申し込むなら true, 申し込みを受けるのを待つ方なら false。
+// true にしたなら、 Opponent も設定してください
+func (config EntryConf) Apply() bool {
+	return config.MatchApplication.Apply
+}
+
+// Opponent - 自分の方から申し込むなら、対戦相手のアカウント名も指定してください。そうでないなら無視されます
+func (config EntryConf) Opponent() string {
+	return config.MatchApplication.Opponent
 }
 
 // Phase - 何路盤
