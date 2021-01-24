@@ -1,5 +1,9 @@
 [Nngs]
 
+# * `Human` - 人間プレイヤーが接続する
+# * `GTP` - GTP(碁テキスト プロトコル)を用いる思考エンジンが接続する
+PlayerType = 'GTP'
+
 Host = 'localhost'
 
 # 接続先サーバーのポート番号

@@ -23,6 +23,7 @@ type NngsClient struct {
 // `github.com/reiver/go-telnet` ライブラリーの動作をリスニングします
 type libraryListener struct {
 	entryConf c.EntryConf
+
 	// NNGSの動作をリスニングします
 	nngsListener e.NngsListener
 	// １行で 1024 byte は飛んでこないことをサーバーと決めておけだぜ☆（＾～＾）
@@ -43,8 +44,10 @@ type libraryListener struct {
 	regexDecline2          regexp.Regexp
 	regexOneSeven          regexp.Regexp
 	regexGame              regexp.Regexp
-	regexMove              regexp.Regexp
-	regexAcceptCommand     regexp.Regexp
+
+	// Example: `15 Game 2 I: kifuwarabe (0 2289 -1) vs kifuwarabi (0 2298 -1)`.
+	regexMove          regexp.Regexp
+	regexAcceptCommand regexp.Regexp
 
 	// MyColor - 自分の手番の色
 	MyColor phase.Phase
@@ -148,19 +151,25 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 
 	switch lib.state {
 	case clistat.None:
+		// Original code: NngsClient.rb/NNGSClient/`def login`
+		// Waitfor "Login: ".
 		if line == "Login: " {
 			// あなたの名前を入力してください。
-			user := lib.nngsListener.InputYourName()
-			// fmt.Printf("[%s]を入力したいぜ☆（＾～＾）", user)
 
-			// 強制的に名前は入力したことにするぜ☆（＾～＾）空白入れてはダメ☆（＾～＾）
-			// if user != "" {
+			// 設定ファイルから自動で入力するぜ☆（＾ｑ＾）
+			user := lib.entryConf.User()
+
+			// 自動入力のときは、設定ミスなら強制終了しないと無限ループしてしまうぜ☆（＾～＾）
+			if user == "" {
+				panic("Need name (User)")
+			}
+
 			oi.LongWrite(w, []byte(user))
 			oi.LongWrite(w, []byte("\n"))
-			//}
 
 			lib.state = clistat.EnteredMyName
 		}
+	// Original code: NngsClient.rb/NNGSClient/`def login`
 	case clistat.EnteredMyName:
 		if line == "1 1" {
 			// パスワードを入れろだぜ☆（＾～＾）
@@ -185,6 +194,9 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 			setClientMode(w)
 			lib.state = clistat.EnteredClientMode
 		}
+		// 入力した名前が被っていれば、ここで無限ループしてるかも☆（＾～＾）
+
+	// Original code: NngsClient.rb/NNGSClient/`def login`
 	case clistat.EnteredMyPasswordAndIAmWaitingToBePrompted:
 		if line == "#> " {
 			setClientMode(w)
@@ -218,25 +230,31 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 		// 	// fmt.Printf("何かコマンドかだぜ☆（＾～＾）？[%s]", line)
 		// }
 		matches := lib.regexCommand.FindSubmatch(lib.lineBuffer[:lib.index])
+
 		//fmt.Printf("m[%s]", matches)
 		//print(matches)
 		if 2 < len(matches) {
-			code, err := strconv.Atoi(string(matches[1]))
+			commandCodeBytes := matches[1]
+			commandCode := string(commandCodeBytes)
+			commandBodyBytes := matches[2]
+			// commandBody := string(commandBodyBytes)
+
+			code, err := strconv.Atoi(commandCode)
 			if err != nil {
 				// 想定外の遷移だぜ☆（＾～＾）！
 				panic(err)
 			}
 			switch code {
 			case 1:
-				subCode, err := strconv.Atoi(string(matches[1]))
+				subCode, err := strconv.Atoi(commandCode)
 				if err == nil {
 					lib.parseSub1(w, subCode)
 				}
 
 			case 9:
 				// print("[9だぜ☆]")
-				if lib.regexUseMatch.Match(matches[2]) {
-					matches2 := lib.regexUseMatchToRespond.FindSubmatch(matches[2])
+				if lib.regexUseMatch.Match(commandBodyBytes) {
+					matches2 := lib.regexUseMatchToRespond.FindSubmatch(commandBodyBytes)
 					if 2 < len(matches2) {
 						// 対局を申し込まれた方だけ、ここを通るぜ☆（＾～＾）
 						// Original code: cmd_match_ok
@@ -258,7 +276,7 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 							panic(fmt.Sprintf("Unexpected phase [%s].", myColor))
 						}
 						// match_accept
-						matches3 := lib.regexAcceptCommand.FindSubmatch(matches[1])
+						matches3 := lib.regexAcceptCommand.FindSubmatch(commandCodeBytes)
 						if 5 < len(matches3) {
 							boardSize, err := strconv.ParseUint(string(matches3[1]), 10, 0)
 							if err != nil {
@@ -286,33 +304,41 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 
 						respondToMatchApplication(w, lib.CommandOfMatchAccept, lib.CommandOfMatchDecline)
 					}
-				} else if lib.regexMatchAccepted.Match(matches[2]) {
+				} else if lib.regexMatchAccepted.Match(commandBodyBytes) {
 					// 黒の手番から始まるぜ☆（＾～＾）
 					lib.Phase = phase.Black
 
-				} else if lib.regexDecline1.Match(matches[2]) {
+				} else if lib.regexDecline1.Match(commandBodyBytes) {
 					print("[対局はキャンセルされたぜ☆]")
 					// self.match_cancel
-				} else if lib.regexDecline2.Match(matches[2]) {
+				} else if lib.regexDecline2.Match(commandBodyBytes) {
 					print("[対局はキャンセルされたぜ☆]")
 					// self.match_cancel
-				} else if lib.regexOneSeven.Match(matches[2]) {
+				} else if lib.regexOneSeven.Match(commandBodyBytes) {
 					print("[サブ遷移へ☆]")
 					lib.parseSub1(w, 7)
 				} else {
 					// "9 1 5" とか来るが、無視しろだぜ☆（＾～＾）
 				}
 			// マッチ確立の合図を得たときだぜ☆（＾～＾）
+			// Original code: NngsClient.rb/NNGSClient/`def parse_15(code, line)`
+			// Example: `15 Game 2 I: kifuwarabe (0 2289 -1) vs kifuwarabi (0 2298 -1)`.
+			// Example: `15   4(B): J4`.
 			case 15:
 				// print("15だぜ☆")
 				doing := true
+
+				// 対局中、ゲーム情報は 指し手の前に毎回流れてくるぜ☆（＾～＾）
+				// 自分が指すタイミングと、相手が指すタイミングのどちらでも流れてくるぜ☆（＾～＾）
+				// とりあえずゲーム情報を全部変数に入れとけばあとで使える☆（＾～＾）
 				if doing {
-					matches2 := lib.regexGame.FindSubmatch(matches[2])
+					matches2 := lib.regexGame.FindSubmatch(commandBodyBytes)
 					if 10 < len(matches2) {
 						// 白 VS 黒 の順序固定なのか☆（＾～＾）？ それともマッチを申し込んだ方 VS 申し込まれた方 なのか☆（＾～＾）？
 						// fmt.Printf("対局現在情報☆（＾～＾） gameid[%s], gametype[%s] white_user[%s][%s][%s][%s] black_user[%s][%s][%s][%s]", matches2[1], matches2[2], matches2[3], matches2[4], matches2[5], matches2[6], matches2[7], matches2[8], matches2[9], matches2[10])
 
 						// ゲームID
+						// Original code: @gameid
 						gameID, err := strconv.ParseUint(string(matches2[1]), 10, 0)
 						if err != nil {
 							panic(err)
@@ -320,9 +346,11 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 						lib.GameID = uint(gameID)
 
 						// ゲームの型？
+						// Original code: @gametype
 						lib.GameType = string(matches2[2])
 
 						// 白手番の名前、フィールド２、残り時間（秒）、フィールド４
+						// Original code: @white_user = [$3, $4, $5, $6]
 						lib.GameWName = string(matches2[3])
 						lib.GameWField2 = string(matches2[4])
 
@@ -335,6 +363,7 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 						lib.GameWField4 = string(matches2[6])
 
 						// 黒手番の名前、フィールド２、残り時間（秒）、フィールド４
+						// Original code: @black_user = [$7, $8, $9, $10]
 						lib.GameBName = string(matches2[7])
 						lib.GameBField2 = string(matches2[8])
 
@@ -350,12 +379,14 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 					}
 				}
 
+				// 指し手はこっちだぜ☆（＾～＾）
 				if doing {
-					matches2 := lib.regexMove.FindSubmatch(matches[2])
+					matches2 := lib.regexMove.FindSubmatch(commandBodyBytes)
 					if 3 < len(matches2) {
+						// Original code: @lastmove = [$1, $2, $3]
 						fmt.Printf("指し手☆（＾～＾） code[%s], color[%s] move[%s]", matches2[1], matches2[2], matches2[3])
 
-						// これから指す方は、局面の手番とは逆になるぜ☆（＾～＾）
+						// 相手の指し手を受信したのだから、手番はその逆だぜ☆（＾～＾）
 						switch string(matches2[2]) {
 						case "B":
 							lib.Phase = phase.White
@@ -366,10 +397,16 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 						}
 
 						if lib.MyColor == lib.Phase {
-							// 自分に手番が回ってきたなら
-							lib.OpponentMove = string(matches2[3])
-							lib.state = clistat.ItIsMyTurn
-							// my_turn
+							// 自分の手番だぜ☆（＾～＾）！
+							lib.OpponentMove = string(matches2[3]) // 相手の指し手が付いてくるので記憶
+							fmt.Printf("自分の手番で一旦ブロッキング☆（＾～＾）")
+							// 初回だけここを通るが、以後、ここには戻ってこないぜ☆（＾～＾）
+							lib.state = clistat.BlockingMyTurn
+
+							// Original code: nngsCUI.rb/announce class/update/`when 'my_turn'`.
+							// Original code: nngsCUI.rb/engine  class/update/`when 'my_turn'`.
+							lib.nngsListener.NoticeMyPhase()
+
 							// @gtp.time_left('WHITE', @nngs.white_user[2])
 							// @gtp.time_left('BLACK', @nngs.black_user[2])
 							/*
@@ -386,20 +423,26 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 							   @nngs.input mv
 							*/
 						} else {
-							// 相手番なら
-							lib.MyMove = string(matches2[3])
-							lib.state = clistat.ItIsOpponentTurn
-							// his_turn
+							// 相手の手番だぜ☆（＾～＾）！
+							lib.MyMove = string(matches2[3]) // 自分の指し手が付いてくるので記憶
+							fmt.Printf("相手の手番で一旦ブロッキング☆（＾～＾）")
+							// 初回だけここを通るが、以後、ここには戻ってこないぜ☆（＾～＾）
+							lib.state = clistat.BlockingOpponentTurn
+
+							// Original code: nngsCUI.rb/annouce class/update/`when 'his_turn'`.
+							// Original code: nngsCUI.rb/engine  class/update/`when 'his_turn'`.
+							lib.nngsListener.NoticeOpponentPhase()
+
+							// lib.
 							/*
-								      nngsmv := args[1]
-								      mv = if nngsmv == 'Pass'
+								      mv = if move == 'Pass'
 								             nil
-								           elsif nngsmv.downcase[/resign/] == "resign"
+								           elsif move.downcase[/resign/] == "resign"
 								             "resign"
 								           else
-								             i = nngsmv.upcase[0].ord - ?A.ord + 1
+								             i = move.upcase[0].ord - ?A.ord + 1
 									         i = i - 1 if i > ?I.ord - ?A.ord
-								             j = nngsmv[/[0-9]+/].to_i
+								             j = move[/[0-9]+/].to_i
 								             [i, j]
 								           end
 								#      p [mv, @his_color]
@@ -414,12 +457,12 @@ func (lib *libraryListener) parse(w telnet.Writer) {
 				// 想定外のコードが来ても無視しろだぜ☆（＾～＾）
 			}
 		}
-	case clistat.ItIsMyTurn:
-		// 自分のターンが回ってきました
-		fmt.Printf("自分[%d]のターン☆（＾～＾）", lib.MyColor)
-	case clistat.ItIsOpponentTurn:
-		// 相手にターンを回しました
-		fmt.Printf("自分[%d]の相手のターン☆（＾～＾）", lib.MyColor)
+	case clistat.BlockingMyTurn:
+		// 自分の手番で受信はブロック中です
+		// fmt.Printf("自分[%d]のターン☆（＾～＾）", lib.MyColor)
+	case clistat.BlockingOpponentTurn:
+		// 相手の手番で受信はブロック中です。
+		// fmt.Printf("自分[%d]の相手のターン☆（＾～＾）", lib.MyColor)
 	default:
 		// 想定外の遷移だぜ☆（＾～＾）！
 		panic(fmt.Sprintf("Unexpected state transition. state=%d", lib.state))
@@ -449,6 +492,7 @@ func (lib *libraryListener) parseSub1(w telnet.Writer, subCode int) {
 }
 
 // 簡易表示モードに切り替えます。
+// Original code: NngsClient.rb/NNGSClient/`def login`
 func setClientMode(w telnet.Writer) {
 	oi.LongWrite(w, []byte("set client true\n"))
 }

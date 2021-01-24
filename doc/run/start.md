@@ -40,7 +40,7 @@ ruby nngsCUI.rb
 ドキュメントの作成、閲覧方法。  
 
 ```shell
-godoc -http=:5555
+godoc -http=localhost:6060
 ```
 
-[http://localhost:5555/](http://localhost:5555/)  
+[http://localhost:5555/](http://localhost:6060/)  

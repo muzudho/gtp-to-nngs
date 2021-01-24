@@ -15,8 +15,8 @@ const (
 	EnteredClientMode
 	// WaitingInTheLobby - 対局が申し込まれるのをロビーで待ちます
 	WaitingInTheLobby
-	// ItIsMyTurn - 自分に手番が回ってきました
-	ItIsMyTurn
-	// ItIsOpponentTurn - 相手に手番を回しました
-	ItIsOpponentTurn
+	// BlockingMyTurn - 自分の手番で受信はブロック中です。
+	BlockingMyTurn
+	// BlockingOpponentTurn - 相手の手番で受信はブロック中です。
+	BlockingOpponentTurn
 )

@@ -2,7 +2,7 @@
 
 # * `Human` - 人間プレイヤーが接続する
 # * `GTP` - GTP(碁テキスト プロトコル)を用いる思考エンジンが接続する
-PlayerType = 'GTP'
+PlayerType = 'Human'
 
 Host = 'localhost'
 
@@ -13,7 +13,7 @@ Port = 9696
 # 対局者名（アカウント名）
 # Only A-Z a-z 0-9
 # Names may be at most 10 characters long
-User = 'Kifuwarabe'
+User = 'Otonb'
 
 # パスワード（任意）
 Pass = ''
@@ -25,7 +25,7 @@ Pass = ''
 Apply = false
 
 # 白番なら 'W', 黒番なら 'B'
-Phase = 'W'
+Phase = 'B'
 
 # 何路盤
 BoardSize = 19

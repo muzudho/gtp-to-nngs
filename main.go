@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 
+	e "github.com/muzudho/gtp-to-nngs/entities"
+
 	c "github.com/muzudho/gtp-to-nngs/controller"
 	"github.com/muzudho/gtp-to-nngs/gateway"
 	"github.com/muzudho/gtp-to-nngs/ui"
@@ -20,7 +22,15 @@ func main() {
 	entryConf := ui.LoadEntryConf(*entryConfPath) // "./input/default.entryConf.toml"
 
 	// NNGSからのメッセージ受信に対応するプログラムを指定したろ☆（＾～＾）
-	nngsController := c.NngsController{EntryConf: entryConf}
+	var nngsController e.NngsListener = nil
+	switch entryConf.Nngs.PlayerType {
+	case "Human":
+		nngsController = c.NngsHumanController{EntryConf: entryConf}
+	case "GTP":
+		nngsController = c.NngsGtpController{EntryConf: entryConf}
+	default:
+		panic(fmt.Sprintf("Unexpected PlayerType=[%s].", entryConf.Nngs.PlayerType))
+	}
 
 	fmt.Println("(^q^) 何か文字を打てだぜ☆ 終わりたかったら [Ctrl]+[C]☆")
 	nngsClient := gateway.NngsClient{}
