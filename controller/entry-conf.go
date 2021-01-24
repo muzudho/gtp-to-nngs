@@ -8,11 +8,13 @@ type EntryConf struct {
 
 // Nngs - [Nngs] 区画。
 type Nngs struct {
-	PlayerType string
-	Host       string
-	Port       int64 // Tomlのライブラリーが精度を細かく指定できないので int64 型で。
-	User       string
-	Pass       string
+	PlayerType          string
+	Host                string
+	Port                int64 // Tomlのライブラリーが精度を細かく指定できないので int64 型で。
+	User                string
+	Pass                string
+	EngineCommand       string
+	EngineCommandOption string
 }
 
 // MatchApplication - [MatchApplication] 区画。
@@ -52,6 +54,16 @@ func (config EntryConf) User() string {
 // Pass - 何路盤
 func (config EntryConf) Pass() string {
 	return config.Nngs.Pass
+}
+
+// EngineCommand - 思考エンジンを起動するコマンドの実行ファイル名の部分（OSにより書き方が異なるかも）
+func (config EntryConf) EngineCommand() string {
+	return config.Nngs.EngineCommand
+}
+
+// EngineCommandOption - 思考エンジンを起動するコマンドの半角スペース区切りの引数（OSにより書き方が異なるかも）
+func (config EntryConf) EngineCommandOption() string {
+	return config.Nngs.EngineCommandOption
 }
 
 // Apply - 自分の方から申し込むなら true, 申し込みを受けるのを待つ方なら false。

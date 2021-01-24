@@ -18,6 +18,11 @@ User = 'Otonb'
 # パスワード（任意）
 Pass = ''
 
+# EngineCommand - 思考エンジンを起動するコマンドの実行ファイル名の部分（OSにより書き方が異なるかも）
+EngineCommand = ''
+# EngineCommandOption - 思考エンジンを起動するコマンドの半角スペース区切りの引数（OSにより書き方が異なるかも）
+EngineCommandOption = ''
+
 # マッチの申込
 [MatchApplication]
 

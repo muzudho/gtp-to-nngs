@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os/exec"
+	"strings"
 
 	e "github.com/muzudho/gtp-to-nngs/entities"
 
@@ -23,10 +25,19 @@ func main() {
 
 	// NNGSからのメッセージ受信に対応するプログラムを指定したろ☆（＾～＾）
 	var nngsController e.NngsListener = nil
+	fmt.Printf("(^q^) プレイヤーのタイプ☆ [%s]", entryConf.Nngs.PlayerType)
 	switch entryConf.Nngs.PlayerType {
 	case "Human":
 		nngsController = c.NngsHumanController{EntryConf: entryConf}
 	case "GTP":
+		// 引数を半角スペース区切り
+		parameters := strings.Split(entryConf.Nngs.EngineCommandOption, " ")
+		fmt.Printf("(^q^) GTP対応の思考エンジンを起動するぜ☆ [%s] [%s]", entryConf.Nngs.EngineCommand, strings.Join(parameters, " "))
+
+		err := exec.Command(entryConf.Nngs.EngineCommand, parameters...).Start()
+		if err != nil {
+			panic(err)
+		}
 		nngsController = c.NngsGtpController{EntryConf: entryConf}
 	default:
 		panic(fmt.Sprintf("Unexpected PlayerType=[%s].", entryConf.Nngs.PlayerType))
