@@ -17,4 +17,6 @@ const (
 	WaitingInTheLobby
 	// ItIsMyTurn - 自分に手番が回ってきました
 	ItIsMyTurn
+	// ItIsOpponentTurn - 相手に手番を回しました
+	ItIsOpponentTurn
 )
