@@ -17,24 +17,6 @@ gtp-to-nngs --entry ./input/default.entryConf.toml
 gtp-to-nngs --entry ./input/kifuwarabi.entryConf.toml
 ```
 
-## engine-b-using, engine-w-using は むずでょが練習してるやつ
-
-NNGSサーバーを立てておく。
-
-```shell
-cd engine-w-using
-
-ruby nngsCUI.rb
-```
-
-別のターミナルを開く。
-
-```shell
-cd engine-b-using
-
-ruby nngsCUI.rb
-```
-
 ## godoc
 
 ドキュメントの作成、閲覧方法。  
@@ -44,9 +26,3 @@ godoc -http=localhost:6060
 ```
 
 [http://localhost:5555/](http://localhost:6060/)  
-
-## 2gtp.rb
-
-```shell
-2gtp.rb "C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-gtp\kifuwarabe-gtp.exe" "C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-gtp\kifuwarabe-gtp.exe"
-```

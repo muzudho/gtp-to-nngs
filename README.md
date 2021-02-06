@@ -9,6 +9,7 @@
   * [About Ruby](./doc/install-about-ruby.md)
   * [About Go](./doc/install-about-go.md)
 * Run
-  * [実行](./doc/run/start.md)
+  * [Start on Go](./doc/run/start-on-go.md)
+  * [Start on Ruby](./doc/run/start-on-ruby.md) is not working.
 * Anothers
   * [オリジナルの GPT2NNGS2 の readme.txt のコピー](./archive/readme.txt)
