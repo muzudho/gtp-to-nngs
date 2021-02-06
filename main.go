@@ -34,7 +34,8 @@ func main() {
 		parameters := strings.Split(entryConf.Nngs.EngineCommandOption, " ")
 		fmt.Printf("(^q^) GTP対応の思考エンジンを起動するぜ☆ [%s] [%s]", entryConf.Nngs.EngineCommand, strings.Join(parameters, " "))
 
-		err := exec.Command(entryConf.Nngs.EngineCommand, parameters...).Start()
+		cmd := exec.Command(entryConf.Nngs.EngineCommand, parameters...)
+		err := cmd.Start()
 		if err != nil {
 			panic(err)
 		}

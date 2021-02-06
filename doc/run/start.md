@@ -44,3 +44,9 @@ godoc -http=localhost:6060
 ```
 
 [http://localhost:5555/](http://localhost:6060/)  
+
+## 2gtp.rb
+
+```shell
+2gtp.rb "C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-gtp\kifuwarabe-gtp.exe" "C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-gtp\kifuwarabe-gtp.exe"
+```

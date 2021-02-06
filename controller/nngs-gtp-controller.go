@@ -1,10 +1,17 @@
 package controller
 
-import e "github.com/muzudho/gtp-to-nngs/entities"
+import (
+	"os/exec"
+
+	e "github.com/muzudho/gtp-to-nngs/entities"
+)
 
 // NngsGtpController - NNGS からの受信メッセージをさばきます。
 type NngsGtpController struct {
 	e.NngsListener
+
+	// EngineIO - GTPプロトコル対応のコンピューター囲碁ソフト（外部プロセス）との入出力に利用
+	EngineIO exec.Cmd
 
 	// EntryConf - 参加設定
 	EntryConf EntryConf
