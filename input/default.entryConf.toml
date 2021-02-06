@@ -19,7 +19,7 @@ User = 'Kifuwarabe'
 Pass = ''
 
 # EngineCommand - 思考エンジンを起動するコマンドの実行ファイル名の部分（OSにより書き方が異なるかも）
-EngineCommand = 'C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-uec12\kifuwarabe-uec12.exe'
+EngineCommand = 'C:\Users\むずでょ\go\src\github.com\muzudho\kifuwarabe-gtp\kifuwarabe-gtp.exe'
 # EngineCommandOption - 思考エンジンを起動するコマンドの半角スペース区切りの引数（OSにより書き方が異なるかも）
 EngineCommandOption = ''
 
