@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 
 	c "github.com/muzudho/gtp-to-nngs/controller"
-	e "github.com/muzudho/kifuwarabe-uec12/entities"
+	e "github.com/muzudho/gtp-to-nngs/entities"
 	"github.com/pelletier/go-toml"
 )
 
